@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GCP AI Masterclass</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .header { background: #4285F4; color: white; padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
+        .card { background: white; margin-bottom: 15px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .card-header { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #eee; }
+        .card-header:hover { background: #f8f9fa; }
+        .card-content { padding: 20px; display: none; background: #fafafa; border-top: 1px solid #eee; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .fnd { background: #e8f0fe; color: #1967d2; }
+        .aic { background: #fef7e0; color: #b06000; }
+        .gen { background: #e6f4ea; color: #137333; }
+        .adv { background: #fce8e6; color: #c5221f; }
+        .quiz-box { margin-top: 15px; padding: 15px; background: #fff; border-left: 4px solid #34A853; border-radius: 5px; }
+        button { background: #4285F4; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .answer { display: none; margin-top: 10px; color: #34A853; font-weight: bold; }
+        .progress-bar { background: #eee; height: 10px; border-radius: 5px; margin-top: 15px; overflow: hidden; }
+        #progress { background: #34A853; height: 100%; width: 0%; transition: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>☁️ GCP AI 12-Week Roadmap</h1>
+            <p>Simplest way to learn the Real Industry Tech Stack</p>
+            <div class="progress-bar"><div id="progress"></div></div>
+            <p id="stat">0/12 Completed</p>
+        </div>
+        <div id="course"></div>
+    </div>
+
+    <script>
+        const data = [{"week": 1, "title": "Cloud Storage \ud83c\udfe0", "lesson": "Think of this as an infinite hard drive. In the industry, we use 'Buckets' to store images for AI training or raw CSV files. It's the starting point for every AI project.", "stack": "Unstructured Data Layer", "quiz": "Where would you store 10,000 photos of circuit boards for a defect-detection AI?", "answer": "A Cloud Storage Bucket!"}, {"week": 2, "title": "BigQuery \ud83d\udcda", "lesson": "This is a 'Data Warehouse'. It lets you run SQL on petabytes of data in seconds. AI needs clean data, and BigQuery is where you 'clean' it using SQL.", "stack": "Analytical Data Layer", "quiz": "You need to find the average temperature of a machine over the last 5 years. Which tool?", "answer": "BigQuery."}, {"week": 3, "title": "Cloud SQL \ud83d\uddc4\ufe0f", "lesson": "While BigQuery is for huge history, Cloud SQL is for 'Right Now'. It handles user logins, passwords, and app settings.", "stack": "Transactional Database Layer", "quiz": "An operator logs into your AI dashboard. Where is their password stored?", "answer": "Cloud SQL."}, {"week": 4, "title": "Pub/Sub \ud83d\udce8", "lesson": "This is the 'Postal Service' of GCP. It allows different parts of your tech stack to talk to each other in real-time without being permanently stuck together.", "stack": "Messaging Middleware", "quiz": "A sensor detects a fire and needs to tell the AI and the Alarm at the same time. What sends the message?", "answer": "Pub/Sub."}, {"week": 5, "title": "Vertex AI Intro \ud83c\udfd7\ufe0f", "lesson": "This is the 'Command Center'. It brings all Google's AI tools into one place. From here, you manage the life of an AI model from birth to retirement.", "stack": "Unified AI Platform", "quiz": "What is the name of the central platform where you manage Google Cloud ML?", "answer": "Vertex AI."}, {"week": 6, "title": "AutoML \ud83e\udd16", "lesson": "No coding required! You give Google your data, tell it what you want to predict, and it 'builds' the best AI model for you automatically.", "stack": "Automated Machine Learning", "quiz": "You have data but no time to write Python code. What feature of Vertex AI do you use?", "answer": "AutoML."}, {"week": 7, "title": "Custom Training \ud83d\udee0\ufe0f", "lesson": "This is for the pros. You write your own Python code (TensorFlow or PyTorch) and run it on Google's powerful GPUs/TPUs for maximum control.", "stack": "Advanced ML Development", "quiz": "If AutoML isn't precise enough, what is your next step?", "answer": "Custom Training."}, {"week": 8, "title": "Model Deployment \ud83d\ude80", "lesson": "A model is useless if it's just a file. You 'Deploy' it to an Endpoint, which turns it into a web link (API) that your apps can call.", "stack": "Model Serving / API Layer", "quiz": "How does your mobile app talk to your AI model?", "answer": "Through a Deployed Endpoint (API)."}, {"week": 9, "title": "Gemini & Studio \ud83e\udde0", "lesson": "Generative AI. Use Gemini to summarize long manuals, write code, or explain images. Vertex AI Studio is the playground to test these prompts.", "stack": "Foundation Model Layer", "quiz": "Which model handles text, code, and images all at once?", "answer": "Gemini."}, {"week": 10, "title": "Vector Search & RAG \ud83d\udd0d", "lesson": "AI can 'hallucinate' (lie). RAG connects the AI to your *actual* company PDFs so it only answers based on your facts.", "stack": "Knowledge Retrieval Layer", "quiz": "How do you stop an AI from making up facts about your company?", "answer": "RAG (Retrieval-Augmented Generation)."}, {"week": 11, "title": "AI Agents \ud83d\udd75\ufe0f", "lesson": "An agent doesn't just talk; it *acts*. It can check your SQL database, send an email, or book a meeting autonomously.", "stack": "Autonomous Agent Layer", "quiz": "A bot that can actually go into a database and fix a record is called an...?", "answer": "AI Agent."}, {"week": 12, "title": "MLOps & Security \ud83d\udee1\ufe0f", "lesson": "The 'Adult in the Room'. This covers monitoring your AI for mistakes, managing costs, and ensuring only the right people have access.", "stack": "Governance & Operations", "quiz": "What do we call the practice of managing AI like a professional software product?", "answer": "MLOps."}];
+        const courseDiv = document.getElementById('course');
+
+        data.forEach((w, index) => {
+            let type = index < 4 ? 'fnd' : index < 8 ? 'aic' : index < 11 ? 'gen' : 'adv';
+            let typeLabel = index < 4 ? 'Foundation' : index < 8 ? 'AI Core' : index < 11 ? 'Gen AI' : 'Advanced';
+            
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-header" onclick="toggle(${index})">
+                    <div>
+                        <input type="checkbox" onclick="event.stopPropagation(); check(${index})" id="check-${index}">
+                        <strong>Week ${w.week}: ${w.title}</strong>
+                    </div>
+                    <span class="badge ${type}">${typeLabel}</span>
+                </div>
+                <div class="card-content" id="content-${index}">
+                    <p><strong>The Lesson:</strong> ${w.lesson}</p>
+                    <p><strong>Real Tech Stack Role:</strong> <code>${w.stack}</code></p>
+                    <div class="quiz-box">
+                        <strong>Test Your Knowledge:</strong><br>
+                        ${w.quiz}<br>
+                        <button onclick="showAns(${index})">Show Answer</button>
+                        <div class="answer" id="ans-${index}">Correct Answer: ${w.answer}</div>
+                    </div>
+                </div>
+            `;
+            courseDiv.appendChild(card);
+        });
+
+        function toggle(i) {
+            const el = document.getElementById(`content-${i}`);
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function showAns(i) {
+            document.getElementById(`ans-${i}`).style.display = 'block';
+        }
+
+        function check() {
+            const checks = document.querySelectorAll('input[type="checkbox"]');
+            const checked = Array.from(checks).filter(c => c.checked).length;
+            document.getElementById('progress').style.width = (checked / 12 * 100) + '%';
+            document.getElementById('stat').innerText = checked + '/12 Completed';
+        }
+    </script>
+</body>
+</html>

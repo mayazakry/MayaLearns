@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comet — Head of Data Prep Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --surface2: #1a2235;
+  --border: #2a3550;
+  --accent: #00e5a0;
+  --accent2: #3b82f6;
+  --accent3: #f59e0b;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --danger: #ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%, rgba(0,229,160,0.04) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.04) 0%, transparent 60%);pointer-events:none;z-index:0}
+
+/* HEADER */
+header{position:relative;z-index:1;padding:40px 40px 0;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.logo{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.2em;text-transform:uppercase}
+.header-title{font-size:28px;font-weight:600;line-height:1.2;margin-top:8px}
+.header-title span{color:var(--accent)}
+.header-sub{font-size:14px;color:var(--muted);margin-top:6px}
+.cost-badge{background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);color:var(--accent);font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;font-family:'Space Mono',monospace;white-space:nowrap;margin-top:8px}
+
+/* NAV */
+nav{position:relative;z-index:1;display:flex;gap:4px;padding:32px 40px 0;flex-wrap:wrap}
+.nav-btn{padding:8px 18px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .2s}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.nav-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+
+/* MAIN */
+main{position:relative;z-index:1;padding:32px 40px 60px}
+.section{display:none}.section.active{display:block}
+
+/* PIPELINE DIAGRAM */
+.pipeline{display:flex;flex-direction:column;align-items:center;gap:0}
+.pipe-node{position:relative;width:100%;max-width:560px;cursor:pointer}
+.pipe-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:all .2s;position:relative;overflow:hidden}
+.pipe-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.pipe-box:hover{border-color:var(--accent);transform:translateX(4px)}
+.pipe-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pipe-content{flex:1}
+.pipe-name{font-size:14px;font-weight:600;color:var(--text)}
+.pipe-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.pipe-tag{font-size:10px;font-family:'Space Mono',monospace;padding:2px 8px;border-radius:4px;margin-left:auto;flex-shrink:0}
+.pipe-arrow{text-align:center;color:var(--muted);font-size:18px;padding:4px 0;line-height:1}
+.pipe-detail{background:var(--surface2);border:1px solid var(--border);border-radius:0 0 12px 12px;padding:16px 20px;margin-top:-8px;display:none;border-top:none}
+.pipe-detail.open{display:block}
+.pipe-detail p{font-size:13px;color:var(--muted);line-height:1.7}
+.pipe-detail .interview-line{margin-top:12px;background:rgba(0,229,160,0.08);border-left:2px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;font-size:12px;color:var(--accent)}
+
+/* WEEKS */
+.week-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
+.wtab{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .15s}
+.wtab:hover{border-color:var(--accent2);color:var(--accent2)}
+.wtab.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+.week-panel{display:none}.week-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.week-panel.active{grid-template-columns:1fr}}
+.week-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.week-card h3{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:14px;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
+.step-row{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-family:'Space Mono',monospace}
+.step-done .step-num{background:var(--accent);color:#000;border-color:var(--accent)}
+.step-text{font-size:13px;color:var(--text);line-height:1.5}
+.step-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.tool-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{font-size:11px;padding:3px 10px;border-radius:12px;border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace}
+.deliverable-box{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:12px 14px;margin-top:14px}
+.deliverable-label{font-size:10px;font-weight:600;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;font-family:'Space Mono',monospace}
+.deliverable-text{font-size:12px;color:var(--text);line-height:1.6}
+.interview-box{background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);border-radius:8px;padding:12px 14px;margin-top:10px}
+.interview-label{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;font-family:'Space Mono',monospace}
+.interview-text{font-size:12px;color:var(--muted);font-style:italic;line-height:1.6}
+
+/* CHECKLIST */
+.checklist{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.checklist{grid-template-columns:1fr}}
+.check-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.check-card h4{font-size:12px;font-weight:600;color:var(--accent3);margin-bottom:10px;font-family:'Space Mono',monospace;text-transform:uppercase}
+.check-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.check-item:last-child{border-bottom:none}
+.check-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.check-label{font-size:13px;color:var(--text)}
+.check-label.done{color:var(--muted);text-decoration:line-through}
+.progress-bar{background:var(--surface2);border-radius:4px;height:6px;margin-bottom:24px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .4s ease}
+.progress-text{font-size:12px;color:var(--muted);margin-bottom:8px;font-family:'Space Mono',monospace}
+
+/* INTERVIEW */
+.qa-grid{display:flex;flex-direction:column;gap:12px}
+.qa-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.qa-question{padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;color:var(--text);transition:background .15s}
+.qa-question:hover{background:var(--surface2)}
+.qa-question .arrow{color:var(--accent);transition:transform .2s;font-size:16px}
+.qa-answer{display:none;padding:14px 18px;background:var(--surface2);border-top:1px solid var(--border);font-size:13px;color:var(--muted);line-height:1.7}
+.qa-answer.open{display:block}
+.qa-answer strong{color:var(--accent);font-weight:500}
+
+/* CONCEPTS */
+.concepts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.concepts-grid{grid-template-columns:1fr}}
+.concept-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.concept-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.concept-emoji{font-size:18px}
+.concept-body{font-size:13px;color:var(--muted);line-height:1.7}
+.concept-body code{font-family:'Space Mono',monospace;font-size:11px;background:var(--surface2);padding:1px 6px;border-radius:4px;color:var(--accent)}
+.vs-row{display:flex;gap:10px;margin-top:10px}
+.vs-col{flex:1;background:var(--surface2);border-radius:8px;padding:10px 12px}
+.vs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:'Space Mono',monospace}
+.vs-body{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* SECTION HEADER */
+.section-header{margin-bottom:28px}
+.section-header h2{font-size:22px;font-weight:600;color:var(--text)}
+.section-header p{font-size:14px;color:var(--muted);margin-top:6px}
+
+/* FREE TIER TABLE */
+.tier-table{width:100%;border-collapse:collapse;font-size:13px}
+.tier-table th{text-align:left;padding:10px 14px;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);font-family:'Space Mono',monospace}
+.tier-table td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text)}
+.tier-table tr:last-child td{border-bottom:none}
+.tier-table tr:hover td{background:var(--surface2)}
+.free-pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(0,229,160,0.1);color:var(--accent);border:1px solid rgba(0,229,160,0.2);font-family:'Space Mono',monospace}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Comet · Head of Data Analytics</div>
+    <div class="header-title">Your Interview <span>Prep Guide</span></div>
+    <div class="header-sub">4 weekends · 6 tech stack layers · 1 end-to-end project</div>
+  </div>
+  <div class="cost-badge">RM 0 total cost</div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="showSection('pipeline')">🏗 Pipeline</button>
+  <button class="nav-btn" onclick="showSection('weeks')">📅 Week Plan</button>
+  <button class="nav-btn" onclick="showSection('checklist')">✅ Progress</button>
+  <button class="nav-btn" onclick="showSection('interview')">🎤 Interview</button>
+  <button class="nav-btn" onclick="showSection('concepts')">🧠 Concepts</button>
+  <button class="nav-btn" onclick="showSection('freetier')">💸 Free Tiers</button>
+</nav>
+
+<main>
+
+<!-- PIPELINE -->
+<div class="section active" id="pipeline">
+  <div class="section-header">
+    <h2>Smart Inspection Analytics Pipeline</h2>
+    <p>Click any layer to see details + your interview talking point</p>
+  </div>
+  <div class="pipeline" id="pipelineEl"></div>
+</div>
+
+<!-- WEEKS -->
+<div class="section" id="weeks">
+  <div class="section-header">
+    <h2>Week-by-Week Build Plan</h2>
+    <p>Each week builds on the last. All tools are free.</p>
+  </div>
+  <div class="week-tabs" id="weekTabs"></div>
+  <div id="weekPanels"></div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="section" id="checklist">
+  <div class="section-header">
+    <h2>Setup Progress Tracker</h2>
+    <p>Tick each item as you complete it — saves in your browser</p>
+  </div>
+  <div class="progress-text" id="progressText">0 of 12 complete</div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="checklist" id="checklistEl"></div>
+</div>
+
+<!-- INTERVIEW -->
+<div class="section" id="interview">
+  <div class="section-header">
+    <h2>Interview Cheat Sheet</h2>
+    <p>Click each question to reveal your answer</p>
+  </div>
+  <div class="qa-grid" id="qaGrid"></div>
+</div>
+
+<!-- CONCEPTS -->
+<div class="section" id="concepts">
+  <div class="section-header">
+    <h2>Key Concepts</h2>
+    <p>The "why" behind every tool choice</p>
+  </div>
+  <div class="concepts-grid" id="conceptsGrid"></div>
+</div>
+
+<!-- FREE TIER -->
+<div class="section" id="freetier">
+  <div class="section-header">
+    <h2>Free Tier Map</h2>
+    <p>Every tool in the stack — RM 0 total</p>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+    <table class="tier-table" id="tierTable"></table>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── PIPELINE DATA ──────────────────────────────────────────────────────────
+const pipeline = [
+  {icon:'📡', name:'IoT Sensors — X-ray / RF machines', tag:'Ingest', color:'#00e5a0',
+   desc:'Manufacturing machines emit sensor readings every few seconds — temperature, vibration, pressure, current. This is where all data originates.',
+   interview:'\"Comet\'s machines generate continuous high-frequency sensor streams. My pipeline starts at the edge — capturing raw readings before any processing.\"'},
+  {icon:'🍃', name:'MongoDB + Cassandra', tag:'Store', color:'#3b82f6',
+   desc:'MongoDB stores semi-structured inspection data (different machines send different fields — NoSQL handles this flexibly). Cassandra handles high-speed time-series sensor streams.',
+   interview:'\"We used MongoDB for raw sensor ingest because manufacturing IoT data is semi-structured — MongoDB\'s schema flexibility handles different machine types better than a relational database.\"'},
+  {icon:'⚡', name:'Databricks + Apache Spark', tag:'Process', color:'#f59e0b',
+   desc:'PySpark reads from the NoSQL layer, cleans the data (SECOM has ~30% nulls), computes shift-level yield rates, engineers features, and saves results as Delta tables.',
+   interview:'\"I ran a PySpark pipeline on Databricks processing 590-dimensional sensor data, computed shift-level yield rates, and stored results as Delta tables — same workflow Comet uses for their production data.\"'},
+  {icon:'🤖', name:'Azure ML / SageMaker — Scikit-learn + PyTorch', tag:'Model', color:'#8b5cf6',
+   desc:'The cleaned features train a Random Forest (fast, interpretable) or LSTM (captures temporal degradation patterns). class_weight="balanced" handles the rare ~5% failure rate.',
+   interview:'\"I used Random Forest with balanced class weights as my baseline — machine failures are rare events, so without rebalancing the model just predicts no failure every time and looks 95% accurate but is useless.\"'},
+  {icon:'🔍', name:'SHAP / LIME — Explainability', tag:'Explain', color:'#ec4899',
+   desc:'SHAP TreeExplainer generates force plots (why did THIS prediction happen?) and summary plots (which sensors matter most overall?). This is critical for operator trust.',
+   interview:'\"I used SHAP to identify which specific sensors — vibration at spindle, heat at bearing — drove each failure prediction. Operators need to know WHY, not just WHAT. That\'s what makes AI trustworthy on the production floor.\"'},
+  {icon:'🔄', name:'GitHub Actions CI/CD — Great Expectations', tag:'Validate', color:'#06b6d4',
+   desc:'Every code push triggers automated data quality checks (Great Expectations) and model smoke tests (pytest). No model deploys unless it passes all gates.',
+   interview:'\"I built a CI/CD pipeline using GitHub Actions — Great Expectations checks run on every commit. No model goes to the API without passing data quality gates. Same principle as software unit testing, applied to data.\"'},
+  {icon:'📊', name:'Power BI Dashboard — ROI', tag:'Deliver', color:'#f59e0b',
+   desc:'The final output translates model predictions into business language: not "94% accuracy" but "RM 87,000 saved from early failure detection this month". 4 visuals: Yield Rate, Top Sensors, Predicted vs Actual, RM Saved KPI.',
+   interview:'\"The headline number is RM saved per month from early failure detection — that\'s what global leadership cares about. I built the dashboard to answer that question directly, not just show model metrics.\"'},
+];
+
+const pipelineEl = document.getElementById('pipelineEl');
+pipeline.forEach((p, i) => {
+  const node = document.createElement('div');
+  node.className = 'pipe-node';
+  node.innerHTML = `
+    <div class="pipe-box" onclick="toggleDetail(${i})" style="--c:${p.color}">
+      <style>.pipe-box:nth-child(1)::before{background:${p.color}}</style>
+      <div class="pipe-icon" style="background:${p.color}22">${p.icon}</div>
+      <div class="pipe-content">
+        <div class="pipe-name">${p.name}</div>
+        <div class="pipe-desc">Click to expand</div>
+      </div>
+      <div class="pipe-tag" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44">${p.tag}</div>
+    </div>
+    <div class="pipe-detail" id="detail-${i}">
+      <p>${p.desc}</p>
+      <div class="interview-line">🎤 Interview: <em>${p.interview}</em></div>
+    </div>`;
+  pipelineEl.appendChild(node);
+  if (i < pipeline.length - 1) {
+    const arrow = document.createElement('div');
+    arrow.className = 'pipe-arrow';
+    arrow.textContent = '↓';
+    pipelineEl.appendChild(arrow);
+  }
+});
+
+function toggleDetail(i) {
+  const d = document.getElementById(`detail-${i}`);
+  d.classList.toggle('open');
+}
+
+// ── WEEKS DATA ─────────────────────────────────────────────────────────────
+const weeks = [
+  {label:'Week 1', title:'Foundation & Data Ingest',
+   tools:['Databricks Community','MongoDB Atlas','Google Colab','GitHub'],
+   steps:[
+     {t:'Sign up for Databricks Community Edition',s:'Go to community.cloud.databricks.com → click Get Started for Free → choose Community Edition (not the trial). Verify your email. No credit card needed.'},
+     {t:'Sign up for MongoDB Atlas M0 free cluster',s:'Go to atlas.mongodb.com → create account → choose M0 Free tier → any region. Create a database user with username + password. Under Network Access → Add IP Address → Allow Access from Anywhere (0.0.0.0/0).'},
+     {t:'Download UCI SECOM dataset',s:'Go to archive.ics.uci.edu/dataset/179/secom → download ZIP → extract two files: secom.data (1,567 rows × 590 sensor columns) and secom.labels (pass/fail label + timestamp per row).'},
+     {t:'Upload SECOM to Databricks',s:'In Databricks: click Data in left sidebar → Add Data → Upload File. Upload both secom.data and secom.labels. They land at /FileStore/tables/secom.data and /FileStore/tables/secom.labels.'},
+     {t:'Create a cluster and run the PySpark notebook',s:'Click Compute → Create Cluster → Single Node → Runtime 13.3 LTS → Create. Once green, create a new Notebook, attach to cluster, paste code from 01_secom_spark_pipeline.py in your ZIP. Run All. Takes ~4 minutes.'},
+     {t:'Open Google Colab → run MongoDB sensor simulation',s:'Go to colab.research.google.com → New Notebook. Cell 1: !pip install pymongo faker. Cell 2: paste connection code with your Atlas URI. Cell 3: paste the sensor simulation code. Run each cell with Shift+Enter.'},
+   ],
+   deliverable:'PySpark notebook computing shift yield rate saved as Delta table. MongoDB Atlas populated with simulated IoT sensor data across 3 machines and 3 shifts.',
+   interview:'"I ran a PySpark pipeline on Databricks processing 590-dimensional sensor data, computed shift-level yield rates, and stored results as Delta tables — same workflow Comet uses for X-ray and RF machine data."'},
+  {label:'Week 2', title:'ML Model + SHAP',
+   tools:['Google Colab','Scikit-learn','SHAP','MLflow'],
+   steps:[
+     {t:'Export cleaned data from Databricks as CSV',s:'In Databricks run: spark.read.format("delta").load("/delta/comet/sensors_clean").toPandas().to_csv("/tmp/sensors_clean.csv"). Then: dbutils.fs.cp("file:/tmp/sensors_clean.csv","dbfs:/FileStore/comet/sensors_clean.csv"). Download from Data → DBFS → FileStore → comet folder.'},
+     {t:'Load CSV into Google Colab',s:'Upload sensors_clean.csv to Colab using the folder icon on the left sidebar → Upload. Then: import pandas as pd; df = pd.read_csv("sensors_clean.csv")'},
+     {t:'Train Random Forest model',s:'from sklearn.ensemble import RandomForestClassifier; from sklearn.model_selection import train_test_split; X = df.drop("label",axis=1); y = df["label"]; X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,stratify=y); model = RandomForestClassifier(n_estimators=100, class_weight="balanced"); model.fit(X_train, y_train). The class_weight="balanced" is critical — failures are only ~5% of data.'},
+     {t:'Install SHAP and generate explanation plots',s:'!pip install shap. Then: import shap; explainer = shap.TreeExplainer(model); shap_values = explainer.shap_values(X_test); shap.summary_plot(shap_values[1], X_test, plot_type="bar", max_display=15). This shows which sensors drive failures most.'},
+     {t:'Set up MLflow experiment tracking',s:'!pip install mlflow. Then add mlflow.sklearn.autolog() before model.fit(). This automatically logs accuracy, AUC, feature importances, and the model file. Run mlflow ui in terminal to see the dashboard (or just check the mlruns folder).'},
+     {t:'Save model and commit to GitHub',s:'import joblib; joblib.dump(model, "rf_model.pkl"). Then create a GitHub repo called comet-analytics-pipeline. Upload your notebook + rf_model.pkl + SHAP plot PNGs. This is your portfolio.'},
+   ],
+   deliverable:'Trained Random Forest model with AUC > 0.75. SHAP force plot + summary plot showing top failure-driving sensors. All logged in MLflow. Saved to GitHub.',
+   interview:'"I used SHAP TreeExplainer to identify which sensors — vibration at spindle, heat at bearing — drove each failure prediction. Operators need to know WHY, not just WHAT. That\'s what builds trust on the production floor."'},
+  {label:'Week 3', title:'CI/CD Pipeline',
+   tools:['GitHub Actions','Great Expectations','pytest','Render.com'],
+   steps:[
+     {t:'Create GitHub Actions workflow file',s:'In your repo create file: .github/workflows/data-quality.yml. Trigger: on push to main. Steps: checkout repo → pip install great_expectations pandas → run python data_checks.py. If any check fails the whole pipeline goes red and blocks the merge.'},
+     {t:'Write a Great Expectations data quality check',s:'pip install great_expectations. Create data_checks.py: load secom CSV, check expect_column_values_to_not_be_null on top 5 sensor columns, check expect_column_values_to_be_between for temperature range. If any expectation fails, raise an exception.'},
+     {t:'Write a pytest model smoke test',s:'Create tests/test_model.py: import joblib, numpy as np; model = joblib.load("rf_model.pkl"); dummy = np.zeros((1, model.n_features_in_)); pred = model.predict(dummy); assert pred[0] in [0,1]; proba = model.predict_proba(dummy); assert 0 <= proba[0][1] <= 1. Run: pytest tests/ -v'},
+     {t:'Add branch protection in GitHub',s:'Go to your repo → Settings → Branches → Add Rule → Branch name: main → tick Require status checks to pass before merging → select your Actions workflow. Now nothing merges to main unless all tests pass.'},
+     {t:'Create a Flask prediction API',s:'Create app.py: from flask import Flask,request,jsonify; import joblib,numpy as np; app=Flask(__name__); model=joblib.load("rf_model.pkl"); @app.route("/predict",methods=["POST"]); def predict(): data=request.json["sensors"]; prob=model.predict_proba([data])[0][1]; return jsonify({"failure_probability":round(prob,4)}). Run locally: python app.py'},
+     {t:'Deploy API free on Render.com',s:'Go to render.com → New Web Service → Connect your GitHub repo → Build Command: pip install flask scikit-learn joblib → Start Command: python app.py → Free tier. Render gives you a public URL like https://comet-api.onrender.com/predict you can demo in the interview.'},
+   ],
+   deliverable:'GitHub repo where every push auto-runs data quality + model tests. Live prediction API at a public URL on Render.com. Branch protection enforced.',
+   interview:'"I built a CI/CD pipeline using GitHub Actions — Great Expectations checks and pytest model tests run on every commit. No model goes live without passing data quality gates. Same principle as software unit testing, applied to data pipelines."'},
+  {label:'Week 4', title:'Power BI ROI Dashboard',
+   tools:['Power BI Desktop','Power BI Service','DAX'],
+   steps:[
+     {t:'Export Spark yield results from Databricks',s:'Download shift_yield_export.csv from Databricks: Data → DBFS → FileStore → comet → shift_yield_export.csv → Download. Save to your Windows Desktop.'},
+     {t:'Create a simulated ROI table in Excel',s:'Open Excel → new sheet → columns: ShiftID, PredictedFailures, ActualFailures, HoursEarlyWarning, CostPerDowntimeHour. Fill 16 rows (one per shift). Set CostPerDowntimeHour = 25000. PredictedFailures = random number 0-5 per shift. Save as roi_data.csv.'},
+     {t:'Open Power BI Desktop and load both files',s:'Download Power BI Desktop free from powerbi.microsoft.com. Open it → Home → Get Data → Text/CSV → load shift_yield_export.csv. Repeat for roi_data.csv. Click Transform Data to check columns loaded correctly.'},
+     {t:'Build 4 dashboard visuals',s:'Visual 1: Line chart — Yield Rate by Shift (X=ShiftID, Y=yield_rate_pct). Visual 2: Bar chart — Top 5 Failure Sensors (use your SHAP summary values). Visual 3: Clustered bar — Predicted vs Actual Failures by Shift. Visual 4: Card visual — RM Saved KPI (large number, centre of dashboard).'},
+     {t:'Add DAX measure for RM Saved',s:'In Power BI: Modeling tab → New Measure. Formula: RM_Saved = SUMX(roi_data, roi_data[PredictedFailures] * roi_data[HoursEarlyWarning] * roi_data[CostPerDowntimeHour]). Format as Currency → RM. This is your headline number.'},
+     {t:'Publish to Power BI Service and get shareable link',s:'File → Publish → Publish to Power BI → My Workspace. Go to app.powerbi.com → find your dashboard → click Share → Copy Link. Paste this link in your application email or open it during the interview.'},
+   ],
+   deliverable:'Published Power BI dashboard with Yield Rate by Shift, Top 5 Failure Sensors, Predicted vs Actual, and RM Saved KPI card. Shareable public URL.',
+   interview:'"The headline number is RM saved per month from early failure detection — that\'s what global leadership cares about, not model accuracy. I built the dashboard to answer that question directly."'},
+  {label:'Bonus ★', title:'Full Pipeline + Loom Video',
+   tools:['MongoDB Atlas','pymongo','Databricks','Loom'],
+   steps:[
+     {t:'Simulate IoT sensor writes to MongoDB from Colab',s:'In Colab: from pymongo import MongoClient; from faker import Faker; import random,datetime. Generate 500 fake sensor readings with machine_id, timestamp, temperature, vibration, pressure, status fields. Insert with collection.insert_many(docs). Verify in Atlas Browse Collections.'},
+     {t:'Connect MongoDB to Databricks using Spark Connector',s:'In Databricks: go to your cluster → Libraries → Install New → Maven → search "org.mongodb.spark:mongo-spark-connector". Then in notebook: df = spark.read.format("mongodb").option("uri", your_atlas_uri).option("database","comet_sensors").option("collection","machine_readings").load()'},
+     {t:'Run full end-to-end pipeline in one notebook',s:'Combine all weeks: MongoDB read → Spark clean → Delta table save → export to Colab → model prediction → SHAP explanation → log to MLflow → export yield CSV for Power BI. This single notebook is your full demo.'},
+     {t:'Write a Head of Data narrative in GitHub README',s:'3 paragraphs: (1) Business problem — Comet loses RM X per unplanned downtime incident. (2) Technical solution — end-to-end pipeline from sensor to prediction. (3) ROI outcome — RM saved per month from early detection. This is what hiring managers read, not the code.'},
+     {t:'Record a 2-minute Loom video walkthrough',s:'Go to loom.com → free account → Record Screen. Show: GitHub repo with green CI/CD checks passing → Databricks notebook running → SHAP summary plot → Power BI dashboard with RM Saved number. Talk through each step in 2 minutes.'},
+     {t:'Send Loom link with your job application',s:'Paste the Loom URL in your cover email: "I built a proof-of-concept pipeline mirroring Comet\'s stack — walkthrough here: [link]". Most candidates send a CV. You send a working demo. That\'s the difference.'},
+   ],
+   deliverable:'Complete end-to-end pipeline from MongoDB IoT simulation through to Power BI ROI dashboard. 2-minute Loom video you can send with your application.',
+   interview:'"I built a full proof-of-concept mirroring Comet\'s stack — MongoDB sensor ingest, Spark processing, scikit-learn model, SHAP explainability, CI/CD quality gates, and a Power BI dashboard showing RM saved. All on free tiers in 4 weekends."'},
+];
+
+const weekTabsEl = document.getElementById('weekTabs');
+const weekPanelsEl = document.getElementById('weekPanels');
+weeks.forEach((w, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'wtab' + (i===0?' active':'');
+  btn.textContent = w.label;
+  btn.onclick = () => activateWeek(i);
+  weekTabsEl.appendChild(btn);
+
+  const div = document.createElement('div');
+  div.className = 'week-panel' + (i===0?' active':'');
+  div.innerHTML = `
+    <div class="week-card">
+      <h3>Steps</h3>
+      <div class="tool-chips">${w.tools.map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+      ${w.steps.map((s,j)=>`
+        <div class="step-row">
+          <div class="step-num">${j+1}</div>
+          <div><div class="step-text">${s.t}</div>${s.s?`<div class="step-sub" style="color:var(--muted);font-size:12px;margin-top:3px;line-height:1.5">${s.s}</div>`:''}</div>
+        </div>`).join('')}
+    </div>
+    <div class="week-card">
+      <h3>Deliverable</h3>
+      <div class="deliverable-box">
+        <div class="deliverable-label">What you build</div>
+        <div class="deliverable-text">${w.deliverable}</div>
+      </div>
+      <div class="interview-box" style="margin-top:16px">
+        <div class="interview-label">Interview talking point</div>
+        <div class="interview-text">${w.interview}</div>
+      </div>
+    </div>`;
+  weekPanelsEl.appendChild(div);
+});
+
+function activateWeek(i) {
+  document.querySelectorAll('.wtab').forEach((b,j)=>b.classList.toggle('active',i===j));
+  document.querySelectorAll('.week-panel').forEach((p,j)=>p.classList.toggle('active',i===j));
+}
+
+// ── CHECKLIST ─────────────────────────────────────────────────────────────
+const checks = [
+  {group:'MongoDB Atlas', items:['M0 cluster created','Database user created (read/write)','Network Access set to 0.0.0.0/0']},
+  {group:'Google Colab', items:['Cell 1 ran — !pip install pymongo faker','Cell 2 ran — connected to Atlas','Cell 3 ran — sensor data written','Atlas Browse Collections — machine_readings visible']},
+  {group:'Databricks', items:['Community Edition account created','SECOM dataset uploaded','PySpark notebook running','Delta tables saved']},
+  {group:'GitHub', items:['Repo created (comet-analytics-pipeline)','Week 1 files committed']},
+];
+
+const checklistEl = document.getElementById('checklistEl');
+let totalItems = 0;
+checks.forEach(group => {
+  const card = document.createElement('div');
+  card.className = 'week-card check-card';
+  card.innerHTML = `<h4>${group.group}</h4>` + group.items.map((item, i) => {
+    const key = `check_${group.group}_${i}`;
+    const checked = localStorage.getItem(key) === '1';
+    totalItems++;
+    return `<div class="check-item" onclick="toggleCheck('${key}', this)">
+      <input type="checkbox" id="${key}" ${checked?'checked':''} onclick="event.stopPropagation();toggleCheck('${key}',this.closest('.check-item'))">
+      <label class="check-label ${checked?'done':''}" for="${key}">${item}</label>
+    </div>`;
+  }).join('');
+  checklistEl.appendChild(card);
+});
+
+function toggleCheck(key, row) {
+  const cb = row.querySelector('input');
+  const label = row.querySelector('.check-label');
+  cb.checked = !cb.checked;
+  localStorage.setItem(key, cb.checked ? '1' : '0');
+  label.classList.toggle('done', cb.checked);
+  updateProgress();
+}
+
+function updateProgress() {
+  const allCBs = document.querySelectorAll('.check-item input');
+  const done = [...allCBs].filter(c=>c.checked).length;
+  const pct = Math.round(done/allCBs.length*100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} of ${allCBs.length} complete — ${pct}%`;
+}
+setTimeout(updateProgress, 100);
+
+// ── INTERVIEW Q&A ─────────────────────────────────────────────────────────
+const qas = [
+  {q:'Tell me about your experience with big data tools',
+   a:'<strong>"I\'ve been working with Databricks and PySpark</strong> — processing 590-dimensional sensor data, computing yield rates across production shifts, storing results as Delta tables. That\'s the same lakehouse architecture Comet uses for X-ray and RF machine data."'},
+  {q:'How would you explain AI decisions to non-technical operators?',
+   a:'<strong>"I used SHAP to identify which specific sensors</strong> drove each failure prediction — vibration at the spindle, heat at the bearing, pressure drop in the coolant line. Operators need to know WHY the model flagged something, not just WHAT it flagged. That\'s what makes AI trustworthy on the production floor."'},
+  {q:'How do you ensure data quality in a production pipeline?',
+   a:'<strong>"I set up GitHub Actions CI/CD with Great Expectations checks</strong> — no model deploys unless the incoming data passes quality gates. Things like: no more than 20% nulls in critical sensor columns, values within expected ranges, row counts within historical bounds. Same principle as software unit testing, applied to data."'},
+  {q:'How do you show ROI to global leadership?',
+   a:'<strong>"I built a Power BI dashboard that translates model predictions into business outcomes</strong> — not just accuracy metrics. The headline number is RM saved per month from early failure detection. If we predict a tool failure 2 hours early, we avoid RM 25,000 in unplanned downtime per incident. That\'s the language leadership speaks."'},
+  {q:'Why MongoDB for IoT sensor data?',
+   a:'<strong>"Manufacturing machines don\'t all emit the same fields</strong> — an X-ray machine sends different readings than an RF machine. With SQL you\'d need to redesign your schema every time a new machine type is added. MongoDB\'s document model handles that schema flexibility natively, at the speed and volume IoT data demands."'},
+  {q:'How would you handle imbalanced data — machine failures are rare?',
+   a:'<strong>"Use class_weight=\'balanced\' in scikit-learn</strong> — it automatically adjusts the loss function so the model pays more attention to the minority class (failures). Without it, the model just predicts no failure every time and looks 95% accurate, but it\'s completely useless. For deep learning I\'d use focal loss or SMOTE oversampling."'},
+  {q:'Walk me through your end-to-end pipeline',
+   a:'<strong>"Data starts at the sensor edge</strong> — X-ray and RF machines write to MongoDB (semi-structured) and Cassandra (time-series). PySpark on Databricks pulls both streams, cleans and joins them, computes shift yield rates. Features feed a Random Forest trained on Azure ML. SHAP explains each prediction. GitHub Actions enforces data quality gates before deployment. Power BI shows leadership the RM saved per month."'},
+];
+
+const qaGrid = document.getElementById('qaGrid');
+qas.forEach((qa, i) => {
+  const card = document.createElement('div');
+  card.className = 'qa-card';
+  card.innerHTML = `
+    <div class="qa-question" onclick="toggleQA(${i})">
+      <span>${qa.q}</span>
+      <span class="arrow" id="arrow-${i}">+</span>
+    </div>
+    <div class="qa-answer" id="qa-${i}">${qa.a}</div>`;
+  qaGrid.appendChild(card);
+});
+
+function toggleQA(i) {
+  const ans = document.getElementById(`qa-${i}`);
+  const arr = document.getElementById(`arrow-${i}`);
+  ans.classList.toggle('open');
+  arr.textContent = ans.classList.contains('open') ? '−' : '+';
+}
+
+// ── CONCEPTS ──────────────────────────────────────────────────────────────
+const concepts = [
+  {emoji:'🗄️', title:'SQL vs NoSQL',
+   body:`SQL = fixed tables like Excel. Every row has the same columns. Great for structured, predictable data.
+   <div class="vs-row">
+     <div class="vs-col"><div class="vs-label" style="color:#3b82f6">SQL</div><div class="vs-body">Fixed schema. All rows identical. Good for reports, transactions.</div></div>
+     <div class="vs-col"><div class="vs-label" style="color:#00e5a0">MongoDB</div><div class="vs-body">Flexible JSON docs. Each machine can send different fields. Good for IoT, logs.</div></div>
+   </div>`},
+  {emoji:'☁️', title:'What is Google Colab?',
+   body:`Free Python environment in your browser. Google runs it on their servers — nothing installed on your laptop. Think of it as Google Docs, but for code. You type code into cells, press Shift+Enter, and it runs live. Saves automatically to Google Drive. Use it to write and test code → then save final versions to GitHub.`},
+  {emoji:'📦', title:'Colab vs GitHub',
+   body:`Two different jobs:
+   <div class="vs-row">
+     <div class="vs-col"><div class="vs-label" style="color:#f59e0b">Colab</div><div class="vs-body">Where you write and run code. Like Microsoft Word. Temporary — session resets.</div></div>
+     <div class="vs-col"><div class="vs-label" style="color:#00e5a0">GitHub</div><div class="vs-body">Where you save finished code permanently. Your portfolio. Interviewer sees this.</div></div>
+   </div>`},
+  {emoji:'⚡', title:'Why Databricks + Spark?',
+   body:`Your laptop can process a 1,567-row CSV in seconds. Comet processes millions of sensor readings per hour. Spark splits that work across many computers simultaneously. Databricks is the managed platform that runs Spark in the cloud. You write Python (<code>PySpark</code>) and Spark handles the distributed execution.`},
+  {emoji:'🔍', title:'Why SHAP matters',
+   body:`A model that says "this machine will fail" is not enough. The operator asks: "which part?" SHAP answers that. It measures how much each sensor reading pushed the prediction toward failure. Output: "Sensor 47 (spindle vibration) contributed 34% of the failure signal." That\'s actionable. That\'s operator trust.`},
+  {emoji:'🔄', title:'What is CI/CD?',
+   body:`CI/CD = Continuous Integration / Continuous Deployment. Every time you push code to GitHub, automated tests run automatically. If they pass, the code deploys. If they fail, nothing breaks in production. For data pipelines: <code>Great Expectations</code> checks data quality. <code>pytest</code> checks model behaviour. GitHub Actions runs both on every push.`},
+];
+
+const conceptsGrid = document.getElementById('conceptsGrid');
+concepts.forEach(c => {
+  const card = document.createElement('div');
+  card.className = 'concept-card';
+  card.innerHTML = `<div class="concept-title"><span class="concept-emoji">${c.emoji}</span>${c.title}</div><div class="concept-body">${c.body}</div>`;
+  conceptsGrid.appendChild(card);
+});
+
+// ── FREE TIER ─────────────────────────────────────────────────────────────
+const tiers = [
+  ['Spark / Lakehouse','Databricks Community Edition','Auto-terminates 2hrs idle, data persists','community.cloud.databricks.com'],
+  ['NoSQL / IoT','MongoDB Atlas M0','512 MB, pauses after 30 days inactive','atlas.mongodb.com'],
+  ['ML Training','Google Colab','12hr session, T4 GPU free','colab.research.google.com'],
+  ['Experiment Tracking','MLflow (local in Colab)','Unlimited','pip install mlflow'],
+  ['CI/CD','GitHub Actions','2,000 min/month free','github.com'],
+  ['API Hosting','Render.com','Free, sleeps after inactivity','render.com'],
+  ['BI Dashboard','Power BI Desktop + Service','Free publish to My Workspace','powerbi.microsoft.com'],
+];
+
+const tierTable = document.getElementById('tierTable');
+tierTable.innerHTML = `<thead><tr><th>Stack Layer</th><th>Free Tool</th><th>Limit</th><th>Link</th></tr></thead>`;
+const tbody = document.createElement('tbody');
+tiers.forEach(r => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${r[0]}</td><td><span class="free-pill">FREE</span> ${r[1]}</td><td style="color:var(--muted);font-size:12px">${r[2]}</td><td><a href="https://${r[3]}" target="_blank" style="color:var(--accent2);font-size:12px;text-decoration:none">${r[3]} ↗</a></td>`;
+  tbody.appendChild(tr);
+});
+tierTable.appendChild(tbody);
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
