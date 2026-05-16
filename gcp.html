@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise GCP AI & Architecture Masterclass</title>
+    <style>
+        :root {
+            --gcp-blue: #4285F4;
+            --gcp-red: #EA4335;
+            --gcp-yellow: #FBBC04;
+            --gcp-green: #34A853;
+            --dark-bg: #1e1e24;
+            --card-bg: #ffffff;
+            --text-main: #202124;
+            --text-muted: #5f6368;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 30px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            text-align: center;
+            margin-bottom: 30px;
+            border-top: 8px solid var(--gcp-blue);
+        }
+        h1 { margin: 0; color: var(--gcp-blue); font-size: 2.4em; }
+        .subtitle { color: var(--text-muted); font-size: 1.1em; margin-top: 10px; }
+        
+        /* Progress Tracking */
+        .progress-container {
+            background: #e8eaed;
+            border-radius: 20px;
+            height: 16px;
+            width: 100%;
+            max-width: 600px;
+            margin: 25px auto 10px auto;
+            overflow: hidden;
+        }
+        #progress-fill {
+            background: linear-gradient(90deg, var(--gcp-blue), var(--gcp-green));
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #progress-status { font-weight: bold; color: var(--text-muted); }
+
+        /* Week Cards */
+        .week-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            border: 1px solid #e0e4ec;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .week-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+        }
+        .week-header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .mastery-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--gcp-green);
+        }
+        .week-metadata { display: flex; flex-direction: column; }
+        .week-num { font-size: 0.85em; font-weight: 700; color: var(--gcp-blue); text-transform: uppercase; letter-spacing: 0.5px; }
+        .week-title { font-size: 1.3em; font-weight: 600; margin: 2px 0; }
+        
+        /* Badges */
+        .badge { padding: 4px 12px; border-radius: 30px; font-size: 0.75em; font-weight: 700; text-transform: uppercase; }
+        .layer-data { background: #e8f0fe; color: #1967d2; }
+        .layer-core { background: #fef7e0; color: #b06000; }
+        .layer-gen { background: #e6f4ea; color: #137333; }
+        .layer-ops { background: #fce8e6; color: #c5221f; }
+
+        /* Content Sections */
+        .week-content {
+            display: none;
+            padding: 30px;
+            background: #fafbfc;
+            border-top: 1px solid #eef2f6;
+        }
+        .week-content.active { display: block; }
+        
+        .section-title {
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gcp-blue);
+            margin: 20px 0 8px 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        /* Tech Spec Tables */
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e0e4ec;
+        }
+        .spec-table td { padding: 12px 15px; border-bottom: 1px solid #f1f3f8; font-size: 0.95em; }
+        .spec-table td:first-child { font-weight: 600; width: 30%; color: var(--text-muted); background: #f8fafe; }
+
+        /* Architecture Mini-Maps */
+        .arch-diagram {
+            background: #282a36;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            white-space: pre;
+            margin: 10px 0 20px 0;
+            border-left: 4px solid var(--gcp-yellow);
+        }
+
+        /* Interactive Quiz Blocks */
+        .production-scenario {
+            background: #fff8e1;
+            border: 1px dashed var(--gcp-yellow);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .scenario-text { font-style: italic; margin-bottom: 15px; }
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: white;
+            border: 1px solid #dcdfe6;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.2s;
+        }
+        .option-btn:hover { background: #f0f4fe; border-color: var(--gcp-blue); }
+        .feedback { display: none; padding: 12px; margin-top: 10px; border-radius: 6px; font-weight: 600; }
+        .feedback.correct { background: #e6f4ea; color: #137333; display: block; }
+        .feedback.incorrect { background: #fce8e6; color: #c5221f; display: block; }
+
+        .toggle-icon { font-size: 1.2em; color: var(--text-muted); transition: transform 0.2s; }
+        .week-card.open-card .toggle-icon { transform: rotate(180deg); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🚀 Enterprise GCP AI Masterclass</h1>
+        <div class="subtitle">Production Architectures & Real-World Tech Stacks</div>
+        <div class="progress-container">
+            <div id="progress-fill"></div>
+        </div>
+        <div id="progress-status">0 of 12 Architecture Modules Mastered</div>
+    </header>
+
+    <div id="masterclass-app"></div>
+</div>
+
+<script>
+const courseModules = [
+    {
+        week: 1,
+        title: "Cloud Storage Ingestion Architecture",
+        layer: "Data Foundation",
+        badgeClass: "layer-data",
+        objective: "Design a high-throughput raw data landing zone for unstructured AI datasets (Images, Audio, multi-GB CSVs).",
+        techStack: {
+            "GCP Service": "Cloud Storage (GCS)",
+            "Ingestion Tools": "Storage Transfer Service / gcloud CLI gsutil parallel threading",
+            "Data Structure": "Immutably locked objects arranged via programmatic prefix patterns (Hive partition compatible)"
+        },
+        diagram: "Raw Event Source ➔ Cloud Pub/Sub ➔ Cloud Function (Validation) ➔ GCS Storage Bucket (Standard Class)",
+        deepDive: "In real-world data pipelines, directory naming structures determine downstream performance. Instead of storing millions of images in a single folder which causes retrieval latency, datasets are partitioned using date-based prefixes (e.g., `gs://bucket_name/dataset_v1/year=2026/month=05/`). Lifecycle management rules are setup to transition old iteration models to Archive classes automatically to reduce costs.",
+        scenario: "Your inspection system generates 50,000 high-resolution bitmap images per hour across multiple shifts. Reading these files directly over a network share causes timeout failures inside training loops.",
+        options: [
+            { text: "A: Mount a shared network file system directly onto your AI instance.", correct: false, feedback: "Incorrect. Shared mounts cause file-locking limits and latency chokepoints when scaling up training workers." },
+            { text: "B: Stream images through a Cloud Function directly into BigQuery rows as BLOBs.", correct: false, feedback: "Incorrect. BigQuery is optimized for analytical records; saving heavy binary assets inside database rows causes exploding storage bills and performance penalties." },
+            { text: "C: Stream images asynchronously to a GCS Bucket using multi-threaded uploads, partitioned by processing date keys.", correct: true, feedback: "Correct! GCS scales out dynamically to meet high-concurrency write requirements, forming an ideal immutable landing pool for large training tasks." }
+        ]
+    },
+    {
+        week: 2,
+        title: "BigQuery Enterprise Analytical Modeling",
+        layer: "Data Foundation",
+        badgeClass: "layer-data",
+        objective: "Prepare multi-terabyte analytical features for machine learning pipelines using optimized database resources.",
+        techStack: {
+            "GCP Service": "BigQuery (BQ) & BigQuery ML (BQML)",
+            "Optimization Stack": "Partitioned Tables + Clustered Columns",
+            "SQL Interface": "Google Standard SQL containing Analytics Windows & ML Functions"
+        },
+        diagram: "GCS (Raw Data CSVs) ➔ BigQuery External Table ➔ SQL Transform ➔ Partitioned Analytics Table",
+        deepDive: "To prevent high query bills, production datasets must explicitly use partition keys (like transaction date stamps) and cluster indexes (like store or region location IDs). BQML allows engineers to write immediate predictive algorithms (`CREATE OR REPLACE MODEL...`) directly on data fields without shifting data out to external platforms.",
+        scenario: "An analyst executes an un-optimized SQL query searching across 10 years of database transactions to build an AI training matrix, resulting in high computing costs for a single run.",
+        options: [
+            { text: "A: Implement partitioning on the transaction date column and cluster fields on frequently filtered keys.", correct: true, feedback: "Correct! Partitioning limits scanned rows, drastically improving query performance and significantly minimizing compute expenditures." },
+            { text: "B: Export data down to an internal server instance to compute calculations in native memory arrays.", correct: false, feedback: "Incorrect. Shifting terabytes of historical metrics over a data network is slow and defeats the purpose of an enterprise data warehouse." }
+        ]
+    },
+    {
+        week: 3,
+        title: "Cloud SQL Operational Integrity",
+        layer: "Data Foundation",
+        badgeClass: "layer-data",
+        objective: "Configure transactional state preservation engines handling user configuration, logs, and token metadata.",
+        techStack: {
+            "GCP Service": "Cloud SQL (Highly Available PostgreSQL or MySQL clusters)",
+            "Connection Layer": "Cloud SQL Auth Proxy container sidestepping public routing rules",
+            "Scaling Pattern": "Read Replicas isolating presentation layers from main master nodes"
+        },
+        diagram: "Application Front-End ➔ Cloud SQL Auth Proxy ➔ Highly Available Read/Write Instance ➔ Failover Replica",
+        deepDive: "AI applications require state persistence for user tokens, preferences, and prompt metadata. Unlike analytical stores, transactional engines require strict ACID compliance. For maximum safety, you deploy operational engines across separate availability zones with automated write-ahead log shipping.",
+        scenario: "During an AI product launch, application traffic spikes 10x. The database master node exhausts available thread connections, causing downtime for updating customer preferences.",
+        options: [
+            { text: "A: Immediately switch app persistence storage to a flat text file system inside Cloud Storage.", correct: false, feedback: "Incorrect. Flat storage doesn't handle concurrency safely and leads to race conditions." },
+            { text: "B: Offload read-heavy dashboard metrics to Cloud SQL Read Replicas and scale memory pools via instance scaling patterns.", correct: true, feedback: "Correct! Isolating application reads from operational writes stops resource starvation on the master database instance." }
+        ]
+    },
+    {
+        week: 4,
+        title: "Pub/Sub Event-Driven Streaming Bus",
+        layer: "Data Foundation",
+        badgeClass: "layer-data",
+        objective: "Architect a decoupler bus managing async message ingestion across multiple computing microservices.",
+        techStack: {
+            "GCP Service": "Cloud Pub/Sub",
+            "Streaming Tools": "Cloud Dataflow (Apache Beam engines for stream transformation)",
+            "Reliability Strategy": "Dead Letter Topics capturing unparseable poison messages"
+        },
+        diagram: "Event Generators ➔ Pub/Sub Topic ➔ Pub/Sub Subscription ➔ Dataflow Worker ➔ Target Storage Engine",
+        deepDive: "When an event occurs (e.g., an anomalous metric reading from a manufacturing line), components shouldn't talk directly to processing nodes. They send events to Pub/Sub. Subscribed services ingest these messages at their own pace, shielding down-stream components from crushing performance overhead during traffic peaks.",
+        scenario: "An upstream parsing app sends formatting payloads that mismatch downstream schemas, causing ingestion loops that block real-time prediction feeds.",
+        options: [
+            { text: "A: Configure a Dead Letter Topic to quarantine broken schemas, allowing normal records to keep flowing.", correct: true, feedback: "Correct! Dead Letter queues isolate unparseable payloads without stopping real-time operations." },
+            { text: "B: Shut down the upstream app components until the downstream schemas are manual adjusted.", correct: false, feedback: "Incorrect. Stopping production data collection causes massive data gaps and impacts reliability metrics." }
+        ]
+    },
+    {
+        week: 5,
+        title: "Vertex AI Unified Governance Core",
+        layer: "AI Core",
+        badgeClass: "layer-core",
+        objective: "Establish metadata tracking and feature management parameters inside centralized machine learning workspaces.",
+        techStack: {
+            "GCP Service": "Vertex AI Platform Suite",
+            "Governance Tools": "Vertex AI Feature Store, Lineage Tracking, Artifact Repositories",
+            "Environment Control": "Vertex AI Workbench instances backed by enterprise security profiles"
+        },
+        diagram: "Data Assets ➔ Feature Store ➔ Vertex AI Workbench ➔ Experiment Tracking Registry",
+        deepDive: "Enterprise machine learning fails when teams use siloed environments. Vertex AI unifies experiments by auto-logging metrics, model artifacts, and training code variations. Feature Store guarantees that identical engineering configurations are utilized across training execution cycles and actual production runtimes.",
+        scenario: "Two data science squads build matching models, but outputs differ significantly because each group computed feature attributes independently using separate raw code scripts.",
+        options: [
+            { text: "A: Force all developers to share a single Jupyter Notebook file hosted on an individual laptop platform.", correct: false, feedback: "Incorrect. Shared static files lack proper versioning control and break when multiple users execute cells concurrently." },
+            { text: "B: Standardize data dimensions inside the Vertex AI Feature Store to feed uniform variables into all modeling pipelines.", correct: true, feedback: "Correct! Centralized feature stores ensure semantic data consistency across distinct engineering teams." }
+        ]
+    },
+    {
+        week: 6,
+        title: "Vertex AutoML Scaled Inferences",
+        layer: "AI Core",
+        badgeClass: "layer-core",
+        objective: "Rapidly prototype and validate production-ready predictive algorithms utilizing automated architecture optimization engines.",
+        techStack: {
+            "GCP Service": "Vertex AI AutoML (Tabular, Image, Text classification options)",
+            "Compute Control": "Managed compute clusters scaled out automatically during training phases",
+            "Evaluation Logic": "Confusion matrices, ROC curves, Precision-Recall optimizations"
+        },
+        diagram: "Vertex Dataset Definition ➔ Target Column Declaration ➔ AutoML Strategy Search ➔ Model Artifact Generation",
+        deepDive: "AutoML accelerates standard tasks like categorization, regression, or simple computer vision. Google's cloud system automatically handles feature transformations, tests various network arrangements, and ensembles the top-performing models, delivering production-grade accuracy with zero custom python code requirements.",
+        scenario: "You need to quickly deploy a classification service to identify custom shipping labels across thousands of incoming inventory items, but your data squad is focused on other projects.",
+        options: [
+            { text: "A: Delay the feature implementation until a custom deep-learning framework can be written manually.", correct: false, feedback: "Incorrect. Custom engineering creates unnecessary delays for common tasks like image classification." },
+            { text: "B: Upload annotated reference samples to a Vertex Dataset and execute an AutoML Image classification pipeline.", correct: true, feedback: "Correct! AutoML resolves common machine learning tasks efficiently, freeing up valuable engineering time." }
+        ]
+    },
+    {
+        week: 7,
+        title: "Advanced Custom Framework Orchestration",
+        layer: "AI Core",
+        badgeClass: "layer-core",
+        objective: "Construct containerized distributed training modules leveraging custom deep-learning code modules.",
+        techStack: {
+            "GCP Service": "Vertex AI Training Jobs + Artifact Registry",
+            "Base Systems": "Docker containers pre-packaged with custom PyTorch or TensorFlow runtimes",
+            "Hardware Backing": "NVIDIA A100 GPUs or Custom Google Tensor Processing Units (TPUs)"
+        },
+        diagram: "Custom Code ➔ Artifact Registry Container Image ➔ Distributed Compute Nodes (TPU/GPU clusters)",
+        deepDive: "When standard algorithms cannot solve specialized multi-modal outputs, custom structures become necessary. You write native scripts, package them inside Docker images, store those assets in the Artifact Registry, and configure multi-node distributed training jobs inside Vertex AI.",
+        scenario: "Your training task takes over 48 hours on standard server hardware, stalling validation tests and critical software sprint windows.",
+        options: [
+            { text: "A: Split training loops across multi-GPU or TPU clusters using Vertex Distributed Custom Training jobs.", correct: true, feedback: "Correct! Distributing workloads across optimized hardware accelerators shortens iteration timelines from days to minutes." },
+            { text: "B: Reduce training dataset volumes by removing 80% of data to speed up local hardware performance.", correct: false, feedback: "Incorrect. Cutting data volumes degrades edge case visibility and compromises overall predictive accuracy." }
+        ]
+    },
+    {
+        week: 8,
+        title: "Model Deployment & API Isolation",
+        layer: "AI Core",
+        badgeClass: "layer-core",
+        objective: "Expose static model file outputs behind highly resilient, auto-scaling API endpoints with performance monitoring.",
+        techStack: {
+            "GCP Service": "Vertex AI Endpoints",
+            "Traffic Strategy": "Split Traffic weights enabling canary deployment strategies",
+            "Observability Engine": "Cloud Logging combined with integrated prediction logging options"
+        },
+        diagram: "Model Registry ➔ Deploy Action ➔ Vertex AI Endpoint ➔ REST/gRPC API Delivery to Web App",
+        deepDive: "Production deployment requires zero-downtime upgrades. Vertex Endpoints insulate core software code components from downstream shifts. When updating an engine, traffic routing percentages can be shifted slowly (e.g., routing 5% of requests to a new model version) to verify operational stability before full cutover.",
+        scenario: "You must deploy an updated product recommendation engine without risking application downtime if the new update exhibits unexpected performance regressions.",
+        options: [
+            { text: "A: Overwrite the active production model immediately during peak consumer traffic hours.", correct: false, feedback: "Incorrect. Instant direct replacements expose real customers to unverified runtime code errors." },
+            { text: "B: Deploy the update to the existing Endpoint alongside the old model, using canary weights to route 5% of traffic initially.", correct: true, feedback: "Correct! Canary releases allow validation under real-world loads while keeping blast radiuses minimal." }
+        ]
+    },
+    {
+        week: 9,
+        title: "Gemini Foundation Architecture & Prompt Design",
+        layer: "Generative AI",
+        badgeClass: "layer-gen",
+        objective: "Integrate multimodal transformer systems safely into corporate applications using programmatic prompt engineering.",
+        techStack: {
+            "GCP Service": "Vertex AI Model Garden / Generative AI Studio",
+            "Model Tiering": "Gemini 1.5 Flash (for high-speed, cost-sensitive actions) vs Gemini 1.5 Pro (for deep reasoning)",
+            "Safety Controls": "Vertex AI Content Safety filter threshold configurations"
+        },
+        diagram: "User App Request ➔ Safety Assessment Filter ➔ Gemini Context Window Engine ➔ Output Sanitizer",
+        deepDive: "Generative engineering in enterprise stacks requires meticulous context management. Vertex AI Studio provides programmatic control over system parameters, temperature settings, and safety configurations. This ensures that models operate safely within strict regulatory compliance rules while keeping transaction costs low.",
+        scenario: "An enterprise customer service application requires a generative chat module that can quickly scan high volumes of user text payloads without driving up API transaction costs.",
+        options: [
+            { text: "A: Route all text evaluation tasks through the most complex, deep-reasoning flagship model arrays.", correct: false, feedback: "Incorrect. Relying heavily on premier models for high-volume, simple tasks results in high API costs and increased latency." },
+            { text: "B: Deploy Gemini 1.5 Flash for rapid, high-volume analysis, reserving more advanced models exclusively for complex edge cases.", correct: true, feedback: "Correct! Tiering foundation models by matching task complexity to processing speed optimizes operational expenditures and latency." }
+        ]
+    },
+    {
+        week: 10,
+        title: "Vector Search & Retrieval-Augmented Generation (RAG)",
+        layer: "Generative AI",
+        badgeClass: "layer-gen",
+        objective: "Eliminate foundational model hallucinations by building accurate data-grounding lookup systems.",
+        techStack: {
+            "GCP Service": "Vertex AI Vector Search (Matching Engine)",
+            "Embedding Logic": "Vertex Text Embeddings API transforming paragraphs into high-dimensional coordinate arrays",
+            "Grounding Store": "BigQuery or local vector index tables storing verified business reference manuals"
+        },
+        diagram: "Doc Storage ➔ Embedding Model ➔ Vector Search Index 🔍 User Query ➔ Vector Match ➔ Gemini Grounded Context ➔ Correct Output",
+        deepDive: "Large language models lack visibility into your company's private records. To fix this safely, documents are converted into high-dimensional vector arrays called 'embeddings' and stored inside a high-speed vector database. When a query is made, the database performs an approximate nearest neighbor search to fetch contextually relevant snippets, injecting those facts directly into the prompt context window.",
+        scenario: "Your internal corporate chatbot keeps making up incorrect policies when employees ask specific questions about health insurance plans.",
+        options: [
+            { text: "A: Retrain the base Gemini model from scratch using your internal company text documents.", correct: false, feedback: "Incorrect. Foundation model pre-training requires millions of dollars in compute, and doesn't prevent future hallucinations." },
+            { text: "B: Convert documents to vector embeddings, perform a real-time semantic lookup via Vertex Vector Search, and ground Gemini with the returned context facts.", correct: true, feedback: "Correct! RAG ensures responses are anchored strictly within verified, verifiable reference documentation." }
+        ]
+    },
+    {
+        week: 11,
+        title: "Autonomous AI Agents & Tool Calling",
+        layer: "Generative AI",
+        badgeClass: "layer-gen",
+        objective: "Build intelligent systems capable of reasoning, calling APIs, and executing database actions independently.",
+        techStack: {
+            "GCP Service": "Vertex AI Agent Builder + Extension Frameworks",
+            "Tool Integrations": "OpenAPI Spec definitions linking agents directly to internal corporate endpoints",
+            "State Machine": "ReAct (Reason + Act) loop architectures keeping operations safe"
+        },
+        diagram: "User Request ➔ Agent Reasoning ➔ Tool Call (SQL Database Query) ➔ Execution Result ➔ Agent Analysis ➔ Final Answer",
+        deepDive: "An Agent moves past text generation by executing actions. By providing an agent with JSON schemas detailing your structural APIs, the LLM determines which tool to execute based on user requests, generates the required execution parameters, receives the API output payload, and formats a final response.",
+        scenario: "A customer wants to modify an online order. The chatbot understands the request but tells the user to log out and update it manually via an old web form.",
+        options: [
+            { text: "A: Expand the model's capabilities into an AI Agent equipped with verified API tool-calling extensions to safely update transaction systems.", correct: true, feedback: "Correct! Enabling secure tool calling allows agents to automate functional tasks directly within designated enterprise systems." },
+            { text: "B: Generate an automated email template instructing internal human support teams to handle the database update manually.", correct: false, feedback: "Incorrect. Over-relying on manual routing for common, predictable operations slows down fulfillment workflows and increases labor costs." }
+        ]
+    },
+    {
+        week: 12,
+        title: "Enterprise MLOps Production Lifecycles",
+        layer: "Advanced MLOps",
+        badgeClass: "layer-ops",
+        objective: "Build automated pipelines to monitor, secure, and update distributed machine learning architectures.",
+        techStack: {
+            "GCP Service": "Vertex AI Pipelines (Kubeflow Orchestration Engines)",
+            "Monitoring Scope": "Vertex AI Model Monitoring evaluating feature data shifts and prediction skew anomalies",
+            "Security Profiles": "IAM precise permissions and Cloud Key Management Service (KMS) custom encryption rings"
+        },
+        diagram: "Production Feedback Loop ➔ Model Performance Monitor ➔ Skew Alert ➔ Trigger Automated Kubeflow Pipeline ➔ Re-Deploy",
+        deepDive: "Machine learning architectures are not set-and-forget. As real-world conditions evolve, models encounter performance degradation known as data drift. MLOps automates reliability by monitoring live data inputs against training baselines, automatically triggering containerized update pipelines when accuracy metrics fall below threshold tolerances.",
+        scenario: "An image recognition system deployed across a factory line slowly drops in predictive accuracy over several months because factory lighting conditions were upgraded.",
+        options: [
+            { text: "A: Manually restart the target endpoint server instance multiple times throughout production shifts.", correct: false, feedback: "Incorrect. Restarting compute hardware does not fix underlying data drift and performance drops caused by out-of-date training profiles." },
+            { text: "B: Configure continuous Vertex Model Monitoring to flag data drift anomalies and automatically trigger retraining pipelines.", correct: true, feedback: "Correct! Continuous monitoring and automated pipeline execution handle real-world operational drift safely and maintain overall system accuracy." }
+        ]
+    }
+];
+
+// App Ingestion Logic
+const appContainer = document.getElementById('masterclass-app');
+
+courseModules.forEach((m, idx) => {
+    const card = document.createElement('div');
+    card.className = 'week-card';
+    card.id = `card-${idx}`;
+    
+    let optionsHtml = m.options.map((opt, oIdx) => `
+        <button class="option-btn" onclick="evaluateAnswer(${idx}, ${oIdx}, ${opt.correct})">
+            ${opt.text}
+        </button>
+    `).join('');
+
+    card.innerHTML = `
+        <div class="week-header" onclick="toggleCardSection(${idx})">
+            <div class="header-left">
+                <input type="checkbox" class="mastery-checkbox" id="check-${idx}" onclick="event.stopPropagation(); recalculateMetrics()">
+                <div class="week-metadata">
+                    <span class="week-num">Week ${m.week}</span>
+                    <span class="week-title">${m.title}</span>
+                </div>
+            </div>
+            <span class="badge ${m.badgeClass}">${m.layer}</span>
+            <div class="toggle-icon" id="icon-${idx}">▼</div>
+        </div>
+        <div class="week-content" id="content-${idx}">
+            <div class="section-title">🎯 Objective</div>
+            <p style="margin: 0 0 15px 0; font-size: 1.05em;">${m.objective}</p>
+            
+            <div class="section-title">🛠️ Industry Tech Stack Specification</div>
+            <table class="spec-table">
+                ${Object.entries(m.techStack).map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
+            </table>
+            
+            <div class="section-title">📊 Architectural Pipeline Flow</div>
+            <div class="arch-diagram">${m.diagram}</div>
+            
+            <div class="section-title">📖 Deep-Dive Architectural Insights</div>
+            <p style="color: #333; font-size: 0.98em; text-align: justify; margin: 0 0 20px 0;">${m.deepDive}</p>
+            
+            <div class="production-scenario">
+                <div class="section-title" style="color: #b06000;">⚠️ Production Architectural Challenge</div>
+                <p class="scenario-text">"${m.scenario}"</p>
+                <div class="options-container">${optionsHtml}</div>
+                <div class="feedback" id="feedback-${idx}"></div>
+            </div>
+        </div>
+    `;
+    appContainer.appendChild(card);
+});
+
+function toggleCardSection(idx) {
+    const content = document.getElementById(`content-${idx}`);
+    const cardEl = document.getElementById(`card-${idx}`);
+    content.classList.toggle('active');
+    cardEl.classList.toggle('open-card');
+}
+
+function evaluateAnswer(wIdx, oIdx, isCorrect) {
+    const feedbackBox = document.getElementById(`feedback-${wIdx}`);
+    const selectedOption = courseModules[wIdx].options[oIdx];
+    
+    feedbackBox.className = isCorrect ? 'feedback correct' : 'feedback incorrect';
+    feedbackBox.innerHTML = selectedOption.feedback;
+}
+
+function recalculateMetrics() {
+    const checkBoxes = document.querySelectorAll('.mastery-checkbox');
+    const checkedCount = Array.from(checkBoxes).filter(c => c.checked).length;
+    const computedPercentage = (checkedCount / 12) * 100;
+    
+    document.getElementById('progress-fill').style.width = computedPercentage + '%';
+    document.getElementById('progress-status').innerText = `${checkedCount} of 12 Architecture Modules Mastered`;
+    
+    // State Preservation Execution
+    const trackingState = Array.from(checkBoxes).map(c => c.checked);
+    localStorage.setItem('gcp_masterclass_state_v3', JSON.stringify(trackingState));
+}
+
+// Initial State Restoring
+const baselineState = JSON.parse(localStorage.getItem('gcp_masterclass_state_v3'));
+const interactiveCheckboxes = document.querySelectorAll('.mastery-checkbox');
+
+if (baselineState) {
+    interactiveCheckboxes.forEach((box, i) => {
+        if(baselineState[i] !== undefined) box.checked = baselineState[i];
+    });
+}
+recalculateMetrics();
+</script>
+
+</body>
+</html>
