@@ -1560,11 +1560,12 @@ function toggleQ(id){
 function renderMock(){
   const cats = ['All', ...new Set(Q.map(q=>q.cat))];
   let html = pageHead('Mock Interview Bank', `${Q.length} interview questions — starting with ⭐ Core, the JD's "Core Technical Focus" list (Azure SQL, Fabric/OneLake, Power BI, ADF, Databricks, Azure ML, Azure OpenAI, Cosmos DB, AI/ML architecture) — plus HR, consulting, SAP, AI, English, and presentation, each with a personalized answer built from your manufacturing/Fabric/AI background.`);
-  html += `<div class="filter-row">${cats.map(c=>`<button class="filter-btn ${mockCatFilter===c?'active':''}" onclick="mockCatFilter='${c}'; renderPage();">${c==='Core'?'⭐ Core':esc(c)}</button>`).join('')}</div>`;
+  html += `<div class="filter-row">${cats.map(c=>`<button class="filter-btn ${mockCatFilter===c?'active':''}" onclick="mockCatFilter='${c}'; mockDiffFilter='All'; renderPage();">${c==='Core'?'⭐ Core':esc(c)}</button>`).join('')}</div>`;
   html += `<div class="filter-row">${['All','easy','medium','hard','architect'].map(d=>`<button class="filter-btn ${mockDiffFilter===d?'active':''}" onclick="mockDiffFilter='${d}'; renderPage();">${esc(d)}</button>`).join('')}</div>`;
   const list = Q.filter(q => (mockCatFilter==='All'||q.cat===mockCatFilter) && (mockDiffFilter==='All'||q.diff===mockDiffFilter));
   html += `<div class="card-sub" style="margin-bottom:10px;">${list.length} question${list.length!==1?'s':''}</div>`;
   html += list.map(renderQCard).join('');
+  if(list.length===0) html += `<div class="card" style="text-align:center;padding:32px;color:var(--muted);">No questions match both filters — tap <b>All</b> on the difficulty row to see the full ${esc(mockCatFilter)} category.</div>`;
   return html;
 }
 
