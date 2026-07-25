@@ -51,8 +51,8 @@ body{
     var(--bg);
   color:var(--text); font-family:var(--sans); line-height:1.5; min-height:100vh;
   -webkit-font-smoothing:antialiased;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:32px 20px;
+  display:flex; flex-direction:column; align-items:center;
+  padding:56px 20px 40px;
 }
 .wrap{ width:100%; max-width:920px; }
 .eyebrow{
@@ -67,7 +67,7 @@ h1{
   text-align:center; color:var(--muted); font-size:14.5px; margin-bottom:44px;
 }
 .choices{
-  display:grid; grid-template-columns:1fr 1fr; gap:20px;
+  display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:56px;
 }
 @media (max-width:680px){ .choices{ grid-template-columns:1fr; } }
 a.card{
@@ -98,6 +98,38 @@ a.card:active{ transform:translateY(-1px); }
 a.card:hover .card-cta{ color:var(--azure); }
 .card.purple:hover{ border-color:var(--purple); }
 .card.purple:hover .card-cta{ color:var(--purple); }
+
+.jd{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); overflow:hidden;
+}
+.jd summary{
+  list-style:none; cursor:pointer; padding:20px 28px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  font-weight:700; font-size:15px;
+}
+.jd summary::-webkit-details-marker{ display:none; }
+.jd summary .chev{ color:var(--muted2); transition:transform .15s ease; font-family:var(--mono); }
+.jd[open] summary .chev{ transform:rotate(90deg); }
+.jd-body{
+  padding:0 28px 32px; border-top:1px solid var(--line-soft);
+}
+.jd-meta{
+  display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 28px;
+}
+.jd-meta span{
+  font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface2);
+  padding:5px 10px; border-radius:20px; border:1px solid var(--line-soft);
+}
+.jd-body h2{
+  font-size:15px; margin:28px 0 10px; letter-spacing:-.01em;
+}
+.jd-body h2:first-child{ margin-top:20px; }
+.jd-body p{ color:var(--muted); font-size:14px; line-height:1.65; margin-bottom:10px; }
+.jd-body ul{ margin:8px 0 4px 20px; color:var(--muted); font-size:14px; line-height:1.7; }
+.jd-body li{ margin-bottom:4px; }
+.jd-body strong{ color:var(--text); }
+.jd-body a{ color:var(--azure); }
 footer{
   text-align:center; color:var(--muted2); font-size:12px; margin-top:40px; font-family:var(--mono);
 }
@@ -105,29 +137,140 @@ footer{
 </head>
 <body>
 <div class="wrap">
-  <div class="eyebrow">Interview Prep</div>
+  <div class="eyebrow">Sonata Software · Interview Prep</div>
   <h1>Senior Solution Architect — Data &amp; AI</h1>
-  <p class="sub">Pick a study guide to open.</p>
+  <p class="sub">Same interview, two study dashboards. Pick whichever you want to review.</p>
 
   <div class="choices">
     <a class="card" href="Azure-Architect-Interview-Dashboard.html">
       <div>
-        <span class="card-tag">Azure</span>
-        <div class="card-title">Azure Data &amp; AI Solution Architect</div>
-        <div class="card-desc">Interview Command Center — deep-dive dashboard covering Azure data &amp; AI architecture topics, patterns, and drills.</div>
+        <span class="card-tag">Dashboard 1</span>
+        <div class="card-title">Azure Interview Command Center</div>
+        <div class="card-desc">Full-depth dashboard: Azure SQL, Fabric, Databricks, Azure OpenAI &amp; AI solution-architecture drills, mapped to the JD's core technical focus.</div>
       </div>
       <div class="card-cta">Open dashboard →</div>
     </a>
 
     <a class="card purple" href="sonata-interview-prep.html">
       <div>
-        <span class="card-tag">Sonata</span>
-        <div class="card-title">Senior Solution Architect Interview Prep</div>
-        <div class="card-desc">DWG-01 guide — role-specific prep focused on the Senior Solution Architect interview loop.</div>
+        <span class="card-tag">Dashboard 2</span>
+        <div class="card-title">DWG-01 Interview Prep Guide</div>
+        <div class="card-desc">Alternate study guide for the same Sonata Senior Solution Architect loop — different structure and angle on the same material.</div>
       </div>
       <div class="card-cta">Open guide →</div>
     </a>
   </div>
+
+  <details class="jd">
+    <summary>Job Description — Senior Solution Architect, Data &amp; AI (Sonata Software) <span class="chev">▸</span></summary>
+    <div class="jd-body">
+      <div class="jd-meta">
+        <span>Sonata Software</span>
+        <span>Permanent · 100% Remote</span>
+        <span>Malaysia or Singapore</span>
+        <span>Fluent Bahasa Melayu/Malay required</span>
+      </div>
+
+      <h2>🎯 More than just a Solution Architect role</h2>
+      <p>This role goes beyond preparing architecture diagrams. You'll work directly with customers' IT and business leaders to understand their application, data and AI priorities, before translating those requirements into secure, scalable Azure solutions.</p>
+      <p>You'll lead technical engagements covering solution architecture, Proofs of Concept (POCs) and Minimum Viable Products (MVPs), helping customers evaluate and adopt Azure Data, AI, application and integration technologies.</p>
+      <p>The role is suitable for an Azure architect who has strong database and data-platform expertise, combined with practical exposure to AI, machine learning, Azure OpenAI or generative AI solutions.</p>
+
+      <h2>🏢 Sonata Software — Global Technology &amp; Modernization Engineering Company</h2>
+      <p>Sonata Software is a global technology company focused on modernization engineering, cloud, data, Microsoft Dynamics, managed services, automation, cybersecurity and digital transformation.</p>
+      <p>The company has an established presence within the Microsoft ecosystem and supports enterprise customers across multiple regions and industries.</p>
+      <p>For candidates who want to deepen their expertise across Microsoft Azure, enterprise data platforms and applied AI, this position offers exposure to customer-facing architecture, solution design, technical workshops, POCs and modern cloud environments.</p>
+
+      <h2>📈 A Role Built Around Azure Data, AI &amp; Solution Architecture</h2>
+      <p>In this role, you'll be responsible for:</p>
+      <ul>
+        <li>Engaging customer IT and business stakeholders to understand their application, database, data and AI priorities</li>
+        <li>Designing secure, scalable and business-focused solutions using Microsoft Azure technologies</li>
+        <li>Leading architecture discussions, technical workshops and solution-design sessions</li>
+        <li>Developing and guiding POCs and MVPs to demonstrate solution feasibility and business value</li>
+        <li>Supporting the adoption of Azure AI, Azure data platforms, application services and GitHub technologies</li>
+        <li>Translating business requirements into practical technical architecture and implementation roadmaps</li>
+        <li>Working with engineering and delivery teams to ensure proposed solutions can be implemented effectively</li>
+        <li>Presenting technical recommendations clearly to both technical and non-technical stakeholders</li>
+        <li>Advising customers on architecture, integration, security, scalability and deployment considerations</li>
+      </ul>
+
+      <h2>🧠 Core Technical Focus</h2>
+      <p>The primary requirement is strong experience in Azure databases and data platforms, supported by practical AI capabilities.</p>
+      <p><strong>Deep technical capability is expected across:</strong></p>
+      <ul>
+        <li>Azure SQL and SQL Server</li>
+        <li>Microsoft Fabric and OneLake</li>
+        <li>Power BI</li>
+        <li>Azure Data Factory</li>
+        <li>Azure Databricks</li>
+      </ul>
+      <p><strong>Strong working knowledge should include:</strong></p>
+      <ul>
+        <li>Azure Machine Learning</li>
+        <li>Azure OpenAI</li>
+        <li>Azure Cosmos DB</li>
+        <li>AI and machine-learning solution architecture</li>
+      </ul>
+      <p><strong>Additional exposure may include:</strong></p>
+      <ul>
+        <li>PostgreSQL and Azure Database for PostgreSQL</li>
+        <li>Azure Synapse Analytics</li>
+        <li>AI agent development</li>
+        <li>Microsoft Copilot technologies</li>
+        <li>Microsoft Purview and data security</li>
+      </ul>
+
+      <h2>🔧 Relevant Supporting Technologies</h2>
+      <p>Experience in one or more of the following areas would be valuable:</p>
+      <ul>
+        <li><strong>Azure AI:</strong> Azure AI Foundry, model deployment, Agent Service, Semantic Kernel, Azure AI Search, Azure Machine Learning and SDKs</li>
+        <li><strong>Copilot:</strong> Microsoft Copilot Studio and enterprise Copilot solutions</li>
+        <li><strong>Applications and Containers:</strong> Azure App Service, AKS, Azure Container Apps, Azure Red Hat OpenShift and Azure Functions</li>
+        <li><strong>Integration:</strong> Azure API Management and Azure Logic Apps</li>
+        <li><strong>DevOps:</strong> CI/CD, Azure DevOps and DevSecOps practices</li>
+        <li><strong>GitHub:</strong> GitHub Copilot, GitHub Enterprise, Advanced Security, Actions and Codespaces</li>
+        <li><strong>AI Infrastructure:</strong> Third-party GPU infrastructure and bring-your-own AI model environments</li>
+        <li><strong>Data Platforms:</strong> Cosmos DB, Azure SQL, PostgreSQL, Microsoft Fabric and Databricks</li>
+      </ul>
+      <p>Candidates are not expected to be equally specialised in every technology listed. However, strong Azure Data expertise and the ability to connect data platforms with AI use cases are essential.</p>
+
+      <h2>🪜 What You'll Be Gaining</h2>
+      <ul>
+        <li>Exposure to enterprise-level Azure Data and AI transformation projects</li>
+        <li>Hands-on involvement in architecture design, POCs and MVPs</li>
+        <li>Opportunities to work directly with customer IT and business decision-makers</li>
+        <li>Deeper experience across Azure SQL, Fabric, Databricks, Azure OpenAI and AI solution architecture</li>
+        <li>Practical exposure to AI agents, cloud-native applications and enterprise integration</li>
+        <li>Experience translating business challenges into commercially relevant technical solutions</li>
+        <li>Broader exposure across Microsoft Azure, GitHub, DevOps and data-security technologies</li>
+        <li>A pathway towards senior cloud, data and AI architecture or technical consulting positions</li>
+      </ul>
+
+      <h2>🚀 Why Consider This Opportunity?</h2>
+      <ul>
+        <li>Permanent position with a global technology and modernization engineering company</li>
+        <li>100% remote working arrangement</li>
+        <li>Open to candidates based in Malaysia or Singapore</li>
+        <li>Strong exposure to Microsoft Azure Data and AI technologies</li>
+        <li>Direct involvement in solution architecture, customer consulting, POCs and MVPs</li>
+        <li>Opportunity to work across data platforms, applied AI and cloud-native technologies</li>
+        <li>Suitable for architects who want to move beyond traditional database architecture into AI-driven solutioning</li>
+      </ul>
+
+      <h2>📍 Working Arrangement</h2>
+      <ul>
+        <li><strong>Company:</strong> Sonata Software</li>
+        <li><strong>Position:</strong> Senior Solution Architect – Data &amp; AI</li>
+        <li><strong>Employment:</strong> Permanent</li>
+        <li><strong>Location:</strong> Malaysia or Singapore</li>
+        <li><strong>Working Arrangement:</strong> 100% Remote</li>
+        <li><strong>Mandatory Language:</strong> Fluent Bahasa Melayu/Malay</li>
+        <li><strong>Primary Expertise:</strong> Azure Databases, Data Platforms and AI</li>
+        <li><strong>Website:</strong> <a href="https://www.sonata-software.com/" target="_blank" rel="noopener">sonata-software.com</a></li>
+      </ul>
+    </div>
+  </details>
 
   <footer>MayaLearns · Study Hub</footer>
 </div>
