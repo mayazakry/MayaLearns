@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DWG-01 · Senior Solution Architect Interview Prep</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#0A1929;
+  --panel:#0F2438;
+  --panel-2:#122C46;
+  --grid:#1B3A56;
+  --azure:#2EA0FF;
+  --azure-dim:#1B6FB8;
+  --amber:#FFB020;
+  --green:#34D399;
+  --text:#E8EEF5;
+  --muted:#7C93AC;
+  --radius:2px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+    var(--bg);
+  background-attachment:local;
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  -webkit-tap-highlight-color:transparent;
+}
+.wrap{max-width:840px;margin:0 auto;padding:0 0 60px;}
+
+/* ---- Title block ---- */
+.titleblock{
+  border-bottom:1px solid var(--grid);
+  padding:22px 18px 16px;
+  position:relative;
+  overflow:hidden;
+}
+.titleblock::before{
+  content:"";
+  position:absolute; inset:0;
+  background:radial-gradient(circle at 15% 0%, rgba(46,160,255,0.14), transparent 55%);
+  pointer-events:none;
+}
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--azure); display:flex; align-items:center; gap:8px; margin-bottom:10px;
+}
+.eyebrow .dot{width:6px;height:6px;background:var(--amber);border-radius:50%;box-shadow:0 0 8px var(--amber);}
+h1{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:26px; line-height:1.15; margin:0 0 6px; font-weight:700;
+  letter-spacing:-.01em;
+}
+h1 span{color:var(--azure);}
+.subrow{
+  display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:12px;
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted);
+}
+.subrow b{color:var(--text); font-weight:500;}
+
+/* ---- progress ---- */
+.progress-strip{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 18px; border-bottom:1px solid var(--grid);
+  font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted);
+}
+.progress-track{flex:1; height:6px; background:var(--panel); border-radius:3px; overflow:hidden; border:1px solid var(--grid);}
+.progress-fill{height:100%; background:linear-gradient(90deg,var(--azure-dim),var(--azure)); width:0%; transition:width .4s ease;}
+#progress-label{white-space:nowrap;}
+
+/* ---- tabs ---- */
+.tabs{
+  display:flex; gap:2px; padding:14px 18px 0;
+  overflow-x:auto; scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.04em;
+  color:var(--muted); background:var(--panel); border:1px solid var(--grid);
+  border-bottom:none; padding:9px 13px; white-space:nowrap; cursor:pointer;
+  border-radius:var(--radius) var(--radius) 0 0; user-select:none;
+}
+.tab.active{color:var(--bg); background:var(--azure); border-color:var(--azure); font-weight:600;}
+
+.panel{display:none; padding:18px; border-top:1px solid var(--grid); animation:fade .25s ease;}
+.panel.active{display:block;}
+@keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+/* ---- card w/ corner brackets ---- */
+.card{
+  position:relative; background:var(--panel); border:1px solid var(--grid);
+  padding:16px; margin-bottom:14px; border-radius:var(--radius);
+}
+.card::before,.card::after{
+  content:""; position:absolute; width:9px; height:9px; border:1.5px solid var(--azure); opacity:.7;
+}
+.card::before{top:-1px; left:-1px; border-right:none; border-bottom:none;}
+.card::after{bottom:-1px; right:-1px; border-left:none; border-top:none;}
+
+.round-tag{
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--bg);
+  background:var(--amber); display:inline-block; padding:2px 8px; border-radius:2px;
+  letter-spacing:.08em; margin-bottom:10px; font-weight:600;
+}
+.card h3{font-family:'Space Grotesk',sans-serif; font-size:16.5px; margin:0 0 6px; font-weight:600;}
+.card .meta{font-size:12px; color:var(--muted); margin-bottom:10px;}
+.card p{font-size:13.5px; line-height:1.55; color:#CBD8E5; margin:0 0 8px;}
+.card ul{margin:6px 0 0; padding-left:18px;}
+.card li{font-size:13.5px; line-height:1.6; color:#CBD8E5; margin-bottom:4px;}
+.sample-qs{
+  margin-top:10px; padding-top:10px; border-top:1px dashed var(--grid);
+}
+.sample-qs .lbl{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--azure); letter-spacing:.08em; margin-bottom:6px;}
+
+/* ---- tech checklist ---- */
+.group-title{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em;
+  color:var(--muted); text-transform:uppercase; margin:18px 0 8px;
+}
+.group-title:first-child{margin-top:0;}
+.tech-item{
+  display:flex; align-items:flex-start; gap:10px; background:var(--panel);
+  border:1px solid var(--grid); border-radius:var(--radius); padding:11px 12px;
+  margin-bottom:8px; cursor:pointer;
+}
+.tech-item:active{background:var(--panel-2);}
+.tech-check{
+  width:18px; height:18px; flex-shrink:0; border:1.5px solid var(--muted);
+  border-radius:3px; margin-top:1px; display:flex; align-items:center; justify-content:center;
+  font-size:12px; color:var(--bg);
+}
+.tech-item.done .tech-check{background:var(--green); border-color:var(--green);}
+.tech-item.done .tech-name{color:var(--muted); text-decoration:line-through;}
+.tech-body{flex:1;}
+.tech-name{font-weight:600; font-size:14px; font-family:'Space Grotesk',sans-serif;}
+.tech-desc{font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.5;}
+
+/* ---- foundry table ---- */
+.term-row{
+  display:grid; grid-template-columns:120px 1fr; gap:12px;
+  padding:11px 0; border-bottom:1px solid var(--grid);
+}
+.term-row:last-child{border-bottom:none;}
+.term-name{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--azure); font-weight:600;}
+.term-def{font-size:13px; line-height:1.55; color:#CBD8E5;}
+
+.callout{
+  background:linear-gradient(135deg, rgba(46,160,255,.1), rgba(255,176,32,.06));
+  border:1px solid var(--azure-dim); border-radius:var(--radius); padding:14px;
+  font-size:13px; line-height:1.6; color:#CBD8E5; margin-bottom:16px;
+}
+.callout b{color:var(--amber);}
+
+/* ---- flashcards ---- */
+.flash-controls{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center;}
+select{
+  background:var(--panel); color:var(--text); border:1px solid var(--grid);
+  font-family:'IBM Plex Mono',monospace; font-size:12px; padding:8px 10px; border-radius:var(--radius);
+}
+.btn{
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; background:var(--panel);
+  color:var(--azure); border:1px solid var(--azure-dim); padding:8px 12px;
+  border-radius:var(--radius); cursor:pointer;
+}
+.btn:active{background:var(--azure-dim); color:var(--bg);}
+.btn.primary{background:var(--azure); color:var(--bg); border-color:var(--azure); font-weight:600;}
+
+.flash-counter{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted); margin-left:auto;}
+
+.flashcard{
+  perspective:1200px; margin-bottom:14px; cursor:pointer;
+}
+.flash-inner{
+  position:relative; width:100%; display:grid;
+  transition:transform .5s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d;
+}
+.flashcard.flipped .flash-inner{transform:rotateY(180deg);}
+.flash-face{
+  grid-column:1; grid-row:1; position:relative; backface-visibility:hidden;
+  border:1px solid var(--grid); border-radius:var(--radius);
+  padding:20px 20px 30px; display:flex; flex-direction:column; justify-content:center;
+  background:var(--panel); min-height:170px;
+}
+.flash-face.front{}
+.flash-face.back{transform:rotateY(180deg); background:var(--panel-2); border-color:var(--azure-dim);}
+.flash-cat{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--amber);
+  letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px;
+}
+.flash-q{font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; line-height:1.4;}
+.flash-a{font-size:14px; line-height:1.6; color:#DCE7F1;}
+.flash-hint{
+  position:absolute; bottom:10px; right:14px; font-family:'IBM Plex Mono',monospace;
+  font-size:10px; color:var(--muted);
+}
+.flash-nav{display:flex; gap:8px; justify-content:space-between;}
+.mark-row{display:flex; gap:8px; margin-top:12px;}
+.mark-row .btn{flex:1; text-align:center;}
+
+/* ---- glossary ---- */
+.glossary dt{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--azure); margin-top:12px; font-weight:600;}
+.glossary dd{margin:3px 0 0; font-size:13px; color:#CBD8E5; line-height:1.5;}
+
+footer{
+  padding:18px; text-align:center; font-family:'IBM Plex Mono',monospace;
+  font-size:10.5px; color:var(--muted); border-top:1px solid var(--grid); margin-top:10px;
+}
+
+@media (max-width:420px){
+  h1{font-size:22px;}
+  .titleblock{padding:18px 14px 14px;}
+  .panel{padding:14px;}
+  .term-row{grid-template-columns:1fr; gap:4px; padding:10px 0;}
+  .card{padding:13px;}
+  .tab{padding:9px 11px; font-size:11px;}
+  .flash-controls{gap:6px;}
+  .flash-counter{width:100%; margin-left:0; order:3; text-align:right;}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <div class="eyebrow"><span class="dot"></span> DWG&#8209;01 &middot; INTERVIEW PREP SET</div>
+    <h1>Senior Solution Architect <span>&mdash; Data &amp; AI</span></h1>
+    <div class="subrow">
+      <span><b>Client:</b> Sonata Software</span>
+      <span><b>Via:</b> Talentvis Malaysia</span>
+      <span><b>Location:</b> MY / SG · Remote</span>
+      <span><b>Rounds:</b> 3</span>
+      <span><b>Language:</b> Bahasa Melayu required</span>
+    </div>
+  </div>
+
+  <div class="progress-strip">
+    <span id="progress-label">0 / 0 mastered</span>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="roadmap">01 · ROADMAP</div>
+    <div class="tab" data-tab="stack">02 · DATA STACK</div>
+    <div class="tab" data-tab="foundry">03 · FOUNDRY</div>
+    <div class="tab" data-tab="qa">04 · Q&amp;A DRILL</div>
+    <div class="tab" data-tab="glossary">05 · GLOSSARY</div>
+    <div class="tab" data-tab="soft">06 · SOFT SKILLS</div>
+  </div>
+
+  <!-- ============ ROADMAP ============ -->
+  <div class="panel active" id="panel-roadmap">
+
+    <div class="card">
+      <div class="round-tag">ROUND 1 &middot; RECRUITER / HR FIT</div>
+      <h3>Background, motivation &amp; logistics</h3>
+      <div class="meta">Likely with Talentvis / Sonata HR &middot; 30&ndash;45 min</div>
+      <p>Screens for narrative fit, remote-work discipline, and the mandatory Bahasa Melayu fluency &mdash; not deep tech.</p>
+      <ul>
+        <li>2-minute career walkthrough that ends on why data+AI architecture, now</li>
+        <li>Confirm comfort with 100% remote, client-facing work</li>
+        <li>Be ready to switch into Bahasa Melayu mid-answer if asked</li>
+        <li>Have a salary range and notice period ready</li>
+      </ul>
+      <div class="sample-qs">
+        <div class="lbl">SAMPLE QUESTIONS + MODEL ANSWERS</div>
+        <ul>
+          <li><b>Why Sonata / this role?</b><br>Global modernization-engineering firm, deep Microsoft &amp; Snowflake partnership; role blends data architecture with applied AI — my exact growth direction.</li>
+          <li><b>How do you stay disciplined fully remote with customers?</b><br>Structured calendar blocks, async status updates, camera-on/agenda-set for every call — treat it like being in the room.</li>
+          <li><b>Led a customer through a tough technical decision?</b><br>STAR: conflicting requirement &rarr; ran a trade-off workshop with stakeholders &rarr; decision adopted &rarr; quantify the outcome.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="round-tag">ROUND 2 &middot; TECHNICAL DEEP DIVE</div>
+      <h3>Hiring manager / principal architect grill</h3>
+      <div class="meta">Whiteboard or verbal architecture questions &middot; 60 min</div>
+      <p>Tests real depth across the Azure data stack, and &mdash; the differentiator for this role &mdash; whether you can connect data platforms to AI use cases, not just describe each in isolation.</p>
+      <ul>
+        <li>Quantify past projects: data volume, users, SLAs, team size</li>
+        <li>For every data answer, add "and here's how I'd layer AI on top"</li>
+        <li>Be honest about breadth vs. depth &mdash; JD explicitly says you don't need to be equally strong everywhere</li>
+      </ul>
+      <div class="sample-qs">
+        <div class="lbl">SAMPLE QUESTIONS + MODEL ANSWERS</div>
+        <ul>
+          <li><b>Fabric platform for near-real-time retail inventory?</b><br>Event Hubs/ADF ingest &rarr; OneLake landing zone &rarr; Fabric Lakehouse on Direct Lake &rarr; Power BI live dashboards; Data Activator fires stock-out alerts.</li>
+          <li><b>Securely ground Azure OpenAI on SQL/Fabric data?</b><br>RAG: index data in Azure AI Search (hybrid/vector), enforce row-level permission trimming, feed only retrieved context to the model, apply content filters.</li>
+          <li><b>Cosmos DB partition-key strategy for high writes?</b><br>Pick a high-cardinality key matching the main query pattern (e.g. customerId) to spread load; avoid low-cardinality keys like date that create hot partitions.</li>
+          <li><b>Databricks or Fabric Spark — and why?</b><br>Databricks for heavy MLOps/MLflow or multi-cloud; Fabric Spark to stay Microsoft-native with unified governance and less ops overhead.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="round-tag">ROUND 3 &middot; CASE STUDY / CLIENT PRESENTATION</div>
+      <h3>Simulated customer engagement</h3>
+      <div class="meta">Leadership + possible client stakeholder &middot; 45&ndash;60 min</div>
+      <p>You'll likely present a solution to a fictional customer brief. Judged on structure, business framing, and how you handle pushback &mdash; the actual day-to-day of the role.</p>
+      <ul>
+        <li>Structure: <b>Discover &rarr; Design &rarr; Validate (POC/MVP) &rarr; Roadmap</b></li>
+        <li>One simple diagram beats ten technical bullet points</li>
+        <li>Tie every component to a business outcome or risk it removes</li>
+        <li>Expect at least one "what if the budget/timeline is cut" curveball</li>
+      </ul>
+      <div class="sample-qs">
+        <div class="lbl">PRACTICE PROMPT + ANSWER SCAFFOLD</div>
+        <ul>
+          <li>"A logistics company wants to modernize its on-prem SQL Server estate and add an AI copilot for support tickets. Present your architecture and a 90-day roadmap."</li>
+          <li><b>Scaffold:</b><br><b>Discover</b> — current SQL Server estate, ticket volume, pain points.<br><b>Design</b> — Azure SQL Managed Instance migration + Azure AI Search over ticket history + Azure OpenAI copilot grounded via RAG.<br><b>Validate</b> — 2-week POC on one ticket category.<br><b>Roadmap</b> — Days 1&ndash;30 migrate/assess, 31&ndash;60 build+POC, 61&ndash;90 pilot with one support team, then scale.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ DATA STACK ============ -->
+  <div class="panel" id="panel-stack">
+    <div class="callout">Tap an item once you can explain it out loud in under 30 seconds without notes. Progress is saved on this device.</div>
+
+    <div class="group-title">Core (deep expertise expected)</div>
+    <div id="stack-core"></div>
+
+    <div class="group-title">Strong working knowledge</div>
+    <div id="stack-strong"></div>
+
+    <div class="group-title">Additional exposure</div>
+    <div id="stack-additional"></div>
+  </div>
+
+  <!-- ============ FOUNDRY ============ -->
+  <div class="panel" id="panel-foundry">
+    <div class="callout">
+      <b>Heads up:</b> "Azure AI Foundry" was rebranded to <b>Microsoft Foundry</b> in 2026. The JD's terminology (Azure AI Foundry, Agent Service, Semantic Kernel, Azure AI Search) is still accurate &mdash; just know the newer name and features below so you sound current.
+    </div>
+
+    <div class="group-title">What changed / what's new</div>
+    <div class="term-row"><div class="term-name">Rebrand</div><div class="term-def">Azure AI Foundry &rarr; <b>Microsoft Foundry</b>: one platform to build, evaluate, deploy and govern both models and agents.</div></div>
+    <div class="term-row"><div class="term-name">Agent Service</div><div class="term-def">Managed, enterprise-grade runtime for hosting agents &mdash; identity, memory, tool-calling, observability and safety built in, no containers to run yourself.</div></div>
+    <div class="term-row"><div class="term-name">Hosted agents</div><div class="term-def">Session-isolated managed runtime for production agents, reaching general availability mid-2026 &mdash; the "just deploy it" tier.</div></div>
+    <div class="term-row"><div class="term-name">Foundry IQ</div><div class="term-def">Unified knowledge/retrieval layer connecting agents to Work IQ, Fabric IQ, Azure SQL, file search and MCP sources behind one SLA-backed endpoint &mdash; cuts custom RAG plumbing.</div></div>
+    <div class="term-row"><div class="term-name">Memory</div><div class="term-def">Agent Service now supports session, user and procedural memory &mdash; the latter lets an agent get better at a task across repeated runs.</div></div>
+    <div class="term-row"><div class="term-name">Toolboxes</div><div class="term-def">Curated, intent-based sets of tools (APIs, MCP servers, functions) an agent can call, managed centrally for governance and reuse.</div></div>
+    <div class="term-row"><div class="term-name">MCP support</div><div class="term-def">Model Context Protocol lets agents call remote or custom tool servers (e.g. Azure DevOps MCP) through one consistent interface &mdash; 1,400+ MCP-enabled tools in the catalog.</div></div>
+    <div class="term-row"><div class="term-name">Entra Agent ID</div><div class="term-def">Agents get their own governed identity in Microsoft Entra &mdash; same authentication/permission/audit model as users and service principals.</div></div>
+    <div class="term-row"><div class="term-name">Governance &amp; eval</div><div class="term-def">ASSERT, Agent Control Specification (ACS), Guided Guardrail Setup and Rubric move evaluation and trust checks into the dev loop, not just post-hoc.</div></div>
+
+    <div class="group-title">How to position it in the interview</div>
+    <div class="card">
+      <p><b>Copilot Studio vs. Foundry:</b> Copilot Studio is low-code, for business users building copilots inside Microsoft 365. Foundry is for developers &mdash; code-first, custom, multi-agent, enterprise-grade.</p>
+      <p><b>Semantic Kernel vs. Agent Service:</b> Semantic Kernel is the open-source orchestration SDK you write code with; Agent Service is where you deploy and run agents (built with Semantic Kernel or any other framework) in production.</p>
+      <p><b>The "so what" for this JD:</b> your Azure data platform expertise (Fabric, SQL, Cosmos DB) is exactly what Foundry IQ needs to ground agents in real enterprise data &mdash; frame every data answer as the foundation an AI agent will sit on top of.</p>
+    </div>
+  </div>
+
+  <!-- ============ Q&A DRILL ============ -->
+  <div class="panel" id="panel-qa">
+    <div class="flash-controls">
+      <select id="cat-filter"></select>
+      <button class="btn" id="shuffle-btn">Shuffle</button>
+      <span class="flash-counter" id="qa-counter"></span>
+    </div>
+
+    <div class="flashcard" id="flashcard">
+      <div class="flash-inner" id="flash-inner">
+        <div class="flash-face front">
+          <div class="flash-cat" id="fc-cat-front">CATEGORY</div>
+          <div class="flash-q" id="fc-question">Question</div>
+          <div class="flash-hint">tap to flip</div>
+        </div>
+        <div class="flash-face back">
+          <div class="flash-cat" id="fc-cat-back">ANSWER</div>
+          <div class="flash-a" id="fc-answer">Answer</div>
+          <div class="flash-hint">tap to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flash-nav">
+      <button class="btn" id="prev-btn">&larr; Prev</button>
+      <button class="btn primary" id="next-btn">Next &rarr;</button>
+    </div>
+    <div class="mark-row">
+      <button class="btn" id="mastered-btn" style="border-color:var(--green); color:var(--green);">&#10003; Mastered</button>
+      <button class="btn" id="reset-btn">Reset progress</button>
+    </div>
+  </div>
+
+  <!-- ============ GLOSSARY ============ -->
+  <div class="panel" id="panel-glossary">
+    <dl class="glossary" id="glossary-list"></dl>
+  </div>
+
+  <!-- ============ SOFT SKILLS ============ -->
+  <div class="panel" id="panel-soft">
+
+    <div class="callout">This role is <b>customer-facing</b> by design &mdash; the JD says you'll lead workshops, present to business leaders, and run POCs face-to-face with clients. Interviewers will weigh how you communicate as heavily as what you know.</div>
+
+    <div class="card">
+      <div class="round-tag">SELF-INTRODUCTION &middot; ~90 SECONDS</div>
+      <h3>Present &rarr; Past &rarr; Future script</h3>
+      <div class="meta">Fill in your own details, then rehearse until it's automatic &mdash; not memorized word-for-word.</div>
+      <ul>
+        <li><b>Open (10s):</b> "Hi, I'm [name], a Solution Architect with [X] years focused on Azure data platforms, and more recently applied AI."</li>
+        <li><b>Present (20s):</b> "Right now at [current company], I [what you do day-to-day &mdash; e.g. design Azure data architectures for enterprise clients, covering SQL, Fabric, and integration with AI]."</li>
+        <li><b>Past (30s):</b> "Before that, I [1&ndash;2 concrete highlights with a number &mdash; e.g. led a Fabric migration that cut reporting time by 40%, or built a Cosmos DB platform handling X requests/sec]."</li>
+        <li><b>Why this role (20s):</b> "What draws me to Sonata is combining deep Azure data architecture with hands-on AI solutioning in a customer-facing role &mdash; that's exactly the direction I want to grow in."</li>
+        <li><b>Close (10s):</b> "Happy to go deeper into any part of that."</li>
+      </ul>
+    </div>
+
+    <div class="group-title">Core soft skills this JD is testing for</div>
+    <div class="term-row"><div class="term-name">Discovery</div><div class="term-def">Asking the right questions to surface a customer's real priorities, not just their stated request.</div></div>
+    <div class="term-row"><div class="term-name">Facilitation</div><div class="term-def">Running a workshop so every voice in the room is heard and the session ends with a clear decision.</div></div>
+    <div class="term-row"><div class="term-name">Translation</div><div class="term-def">Converting technical trade-offs into business language &mdash; cost, risk, speed &mdash; without losing accuracy.</div></div>
+    <div class="term-row"><div class="term-name">Objection handling</div><div class="term-def">Responding to pushback with a calm, specific answer instead of getting defensive or over-explaining.</div></div>
+    <div class="term-row"><div class="term-name">Executive presence</div><div class="term-def">Staying concise and confident under pressure &mdash; leading with the answer, then the reasoning if asked.</div></div>
+    <div class="term-row"><div class="term-name">Active listening</div><div class="term-def">Reflecting back what a stakeholder said before responding, so they feel heard and you avoid solving the wrong problem.</div></div>
+    <div class="term-row"><div class="term-name">Remote discipline</div><div class="term-def">Camera on, clear agendas, and proactive written follow-ups &mdash; since there's no hallway to catch up in.</div></div>
+    <div class="term-row"><div class="term-name">Cross-cultural fluency</div><div class="term-def">Comfortably switching register &mdash; and language &mdash; between Malaysian/Singaporean business stakeholders.</div></div>
+
+    <div class="card">
+      <div class="round-tag">QUICK TIPS</div>
+      <h3>Before you walk in</h3>
+      <ul>
+        <li>Use STAR (Situation, Task, Action, Result) for every behavioral answer &mdash; end on a number if you can.</li>
+        <li>Match the interviewer's technical depth: go deep with an architect, stay outcome-level with HR or a client.</li>
+        <li>Have 2&ndash;3 specific reasons "why Sonata" ready &mdash; generic answers stand out for the wrong reason.</li>
+        <li>Rehearse your intro once in Bahasa Melayu too &mdash; even a short bilingual switch signals genuine fluency.</li>
+        <li>End every answer with a natural stopping point; don't trail off or over-explain past the point.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>PREPARED FOR &middot; SENIOR SOLUTION ARCHITECT &ndash; DATA &amp; AI &middot; SONATA SOFTWARE &middot; SCALE: N.T.S.</footer>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const techStack = {
+  core: [
+    {name:"Azure SQL & SQL Server", desc:"PaaS Database vs Managed Instance vs IaaS VM — know when to pick each."},
+    {name:"Microsoft Fabric & OneLake", desc:"SaaS analytics platform; OneLake is the single tenant-wide Delta/Parquet lake all workloads share."},
+    {name:"Power BI", desc:"Import vs DirectQuery vs Direct Lake (Fabric-native, near-import speed on live OneLake data)."},
+    {name:"Azure Data Factory", desc:"Pipeline-based ETL/ELT, 90+ connectors; now embedded natively in Fabric."},
+    {name:"Azure Databricks", desc:"Spark + Delta Lake + MLflow; strongest choice for heavy ML/MLOps or multi-cloud portability."}
+  ],
+  strong: [
+    {name:"Azure Machine Learning", desc:"End-to-end ML lifecycle: training, MLOps pipelines, model registry, endpoints."},
+    {name:"Azure OpenAI", desc:"Enterprise-hosted OpenAI models with Azure networking, compliance and data residency."},
+    {name:"Azure Cosmos DB", desc:"Globally distributed NoSQL; five consistency levels trade off latency vs. consistency."},
+    {name:"AI & ML solution architecture", desc:"Designing where models, data, and orchestration fit together end to end."}
+  ],
+  additional: [
+    {name:"PostgreSQL / Azure DB for PostgreSQL", desc:"Open-source, PostGIS/extensions, Linux-first workloads."},
+    {name:"Azure Synapse Analytics", desc:"Standalone predecessor engine now largely wrapped inside Fabric."},
+    {name:"AI agent development", desc:"Building agents with frameworks like Semantic Kernel, deployed via Foundry Agent Service."},
+    {name:"Microsoft Copilot technologies", desc:"Copilot Studio (low-code business copilots) vs. custom Foundry agents (code-first)."},
+    {name:"Microsoft Purview", desc:"Unified data governance — cataloging, lineage, classification, sensitivity labels."}
+  ]
+};
+
+const flashcards = [
+  {cat:"Data", q:"SQL Database vs. Managed Instance — the key difference?", a:"SQL Database is single-DB PaaS with near-full T-SQL. Managed Instance gives near-100% SQL Server compatibility (cross-db queries, SQL Agent, linked servers) inside a VNet — best for lift-and-shift."},
+  {cat:"Data", q:"What is Microsoft Fabric, in one line?", a:"A unified SaaS analytics platform (Data Factory + Synapse engines + Power BI + Data Activator) built on one shared OneLake storage layer."},
+  {cat:"Data", q:"What is OneLake?", a:"Fabric's single, tenant-wide logical data lake (on ADLS Gen2, Delta/Parquet format) that every Fabric workload reads and writes — no data duplication."},
+  {cat:"Data", q:"Synapse vs. Fabric?", a:"Synapse is the standalone analytics service (dedicated/serverless SQL pools, Spark). Fabric is the newer SaaS evolution wrapping those engines plus ADF and Power BI under OneLake with unified governance."},
+  {cat:"Data", q:"When would you pick Databricks over Fabric/Synapse Spark?", a:"When you need advanced MLOps (MLflow), Delta Live Tables, multi-cloud portability, or the team already has deep Databricks skills."},
+  {cat:"Data", q:"ADF vs. Fabric Data Factory?", a:"Both give pipeline-based ETL/ELT with 90+ connectors; Fabric's version is SaaS-native inside OneLake with no separate resource provisioning."},
+  {cat:"Data", q:"Name Cosmos DB's five consistency levels.", a:"Strong, Bounded Staleness, Session, Consistent Prefix, Eventual — each trades latency/availability against consistency."},
+  {cat:"Data", q:"PostgreSQL on Azure vs. Azure SQL — when each?", a:"PostgreSQL for open-source/PostGIS/extension needs or Linux workloads; Azure SQL for deep Microsoft-ecosystem integration and T-SQL."},
+  {cat:"Data", q:"What does Microsoft Purview do?", a:"Unified data governance — cataloging, lineage tracking, classification and sensitivity labeling across on-prem, multicloud and SaaS data."},
+  {cat:"Data", q:"Power BI: Import vs. DirectQuery vs. Direct Lake?", a:"Import caches in-memory (fast, needs refresh). DirectQuery hits the source live (fresh, slower). Direct Lake (Fabric-only) reads Delta/Parquet straight from OneLake — near-import speed, always fresh."},
+
+  {cat:"Foundry / AI", q:"What is Microsoft Foundry?", a:"The rebranded, unified platform (formerly Azure AI Foundry) for building, evaluating, deploying and governing AI models and agents — model catalog, Agent Service, Foundry IQ, and eval tools together."},
+  {cat:"Foundry / AI", q:"What is Foundry Agent Service?", a:"A managed enterprise runtime for hosting AI agents — identity, memory, tool-calling, observability and safety handled for you, no containers to manage."},
+  {cat:"Foundry / AI", q:"What is Foundry IQ?", a:"The unified retrieval layer connecting agents to Work IQ, Fabric IQ, Azure SQL, file search and MCP sources through one SLA-backed endpoint — removes custom RAG plumbing."},
+  {cat:"Foundry / AI", q:"What memory types does Agent Service support?", a:"Session, user, and procedural memory — procedural memory helps an agent get better at a repeated task over time."},
+  {cat:"Foundry / AI", q:"What's a Toolbox in Foundry?", a:"A curated, intent-based set of tools (APIs, MCP servers, functions) an agent can call, managed centrally for governance and reuse."},
+  {cat:"Foundry / AI", q:"What is MCP and why does it matter here?", a:"Model Context Protocol — an open standard letting agents call external tools/data sources consistently. Foundry supports remote and custom MCP servers, e.g. Azure DevOps MCP."},
+  {cat:"Foundry / AI", q:"Semantic Kernel vs. Agent Service — what's the split?", a:"Semantic Kernel is the open-source SDK you orchestrate agents with in code. Agent Service is where you deploy and host those agents in production."},
+  {cat:"Foundry / AI", q:"What is Entra Agent ID?", a:"A governed identity type in Microsoft Entra specifically for AI agents — same auth/permissions/audit model as users and service principals."},
+  {cat:"Foundry / AI", q:"Role of Azure AI Search in an AI solution?", a:"Provides vector, keyword and hybrid search over enterprise content to ground LLM answers (RAG) with relevant, permission-trimmed context."},
+  {cat:"Foundry / AI", q:"Copilot Studio vs. Foundry — when to use which?", a:"Copilot Studio: low-code, business users, copilots inside Microsoft 365. Foundry: developers, code-first, custom or multi-agent enterprise builds."},
+  {cat:"Foundry / AI", q:"What is Azure OpenAI Service?", a:"Microsoft's enterprise-hosted access to OpenAI models with Azure networking, compliance controls and regional data residency."},
+  {cat:"Foundry / AI", q:"How do you reduce hallucination in an Azure OpenAI solution?", a:"Ground it with RAG via Azure AI Search, scope tightly with system prompts, add content filters/guardrails, and evaluate with tools like ACS/Rubric before production."},
+  {cat:"Foundry / AI", q:"What is a 'hosted agent' in 2026 Foundry terms?", a:"A session-isolated, managed-runtime deployment of an agent — reaching general availability mid-2026 — that removes the need to run your own containers for production agents."},
+
+  {cat:"Architecture", q:"How do you open a customer engagement as a Solution Architect?", a:"A discovery workshop to understand business goals, current-state architecture, pain points and constraints — before mapping to any target-state design."},
+  {cat:"Architecture", q:"POC vs. MVP — how do you explain it to a customer?", a:"A POC proves technical feasibility on a narrow scope and isn't production-ready. An MVP is a minimal but usable, production-viable version of the solution."},
+  {cat:"Architecture", q:"Customer wants to skip security review to hit a deadline — what do you do?", a:"Explain the risk trade-off clearly, propose a phased approach with minimum viable security controls first, and get stakeholder sign-off in writing."},
+  {cat:"Architecture", q:"How do you present architecture to non-technical stakeholders?", a:"Lead with the business outcome, use one simple diagram, avoid jargon, and tie every component to a benefit or risk it addresses."},
+  {cat:"Architecture", q:"AKS vs. Container Apps vs. App Service — how do you choose?", a:"App Service for simple web apps with minimal ops. Container Apps for microservices/event-driven apps needing serverless scaling without K8s complexity. AKS when you need full Kubernetes control."},
+  {cat:"Architecture", q:"How do you balance scalability and security in a design?", a:"Apply the Azure Well-Architected Framework pillars — reliability, security, cost, operational excellence, performance — as parallel lenses, not sequential trade-offs."},
+  {cat:"Architecture", q:"Role of GitHub Copilot / Advanced Security in an Azure engagement?", a:"Copilot speeds up developers in the IDE; Advanced Security adds code scanning, secret scanning and dependency review directly in the GitHub workflow feeding CI/CD."},
+  {cat:"Architecture", q:"What is DevSecOps in an Azure DevOps/GitHub Actions pipeline?", a:"Embedding security scanning (SAST/DAST, dependency checks) directly into CI/CD so vulnerabilities are caught before deployment, not after."},
+
+  {cat:"Data", q:"What is a Lakehouse?", a:"Combines data-lake storage flexibility with warehouse-like structure and SQL querying (Delta tables) in one layer."},
+  {cat:"Data", q:"What is a Fabric Warehouse item?", a:"A fully managed, SQL-based warehouse built on OneLake with full T-SQL support — for teams that want a classic relational experience."},
+  {cat:"Data", q:"What is Delta Lake / the Delta format?", a:"An open storage layer adding ACID transactions, versioning, and schema enforcement on top of Parquet files."},
+  {cat:"Data", q:"What is data mesh?", a:"A decentralized model where domain teams own and serve their own data as a product, instead of one central data team."},
+  {cat:"Data", q:"Star schema vs. snowflake schema?", a:"Star: denormalized dimensions around one fact table, faster queries. Snowflake: normalized dimensions, less storage, more joins."},
+  {cat:"Data", q:"What is a medallion architecture?", a:"Bronze (raw) → Silver (cleaned/conformed) → Gold (business-ready) — a layered data refinement pattern."},
+  {cat:"Data", q:"What is CDC (Change Data Capture)?", a:"Capturing and streaming only the changed rows from a source system for near-real-time sync."},
+  {cat:"Data", q:"Event Hubs vs. Service Bus?", a:"Event Hubs: high-throughput streaming/telemetry ingestion. Service Bus: enterprise messaging with queues/topics and guaranteed delivery."},
+  {cat:"Data", q:"What is a Synapse serverless SQL pool?", a:"A pay-per-query SQL engine over files in a data lake — no infrastructure to provision."},
+  {cat:"Data", q:"Role of Azure Data Lake Storage Gen2?", a:"Hierarchical-namespace blob storage that's the analytics foundation underlying OneLake."},
+
+  {cat:"Foundry / AI", q:"What is a system prompt?", a:"Instructions given to an LLM before user input, to set its role, behavior, and constraints."},
+  {cat:"Foundry / AI", q:"What is prompt engineering?", a:"Crafting inputs — instructions, examples, structure — to reliably get the output you want from a model."},
+  {cat:"Foundry / AI", q:"What is fine-tuning?", a:"Further training a pretrained model on your own labeled data to specialize its behavior."},
+  {cat:"Foundry / AI", q:"What are embeddings / vector search?", a:"Converting text into numeric vectors so semantically similar content can be found by distance, not just keyword match."},
+  {cat:"Foundry / AI", q:"What is a token in LLM context?", a:"A chunk of text (word or sub-word) the model processes — cost and limits are measured in tokens."},
+  {cat:"Foundry / AI", q:"What is a context window?", a:"The maximum amount of text, in tokens, a model can consider at once for a given request."},
+  {cat:"Foundry / AI", q:"What is RAG, one more time, plainly?", a:"Retrieval-Augmented Generation — fetch relevant external data first, then feed it to the model to ground its answer."},
+  {cat:"Foundry / AI", q:"What is a multi-agent system?", a:"Multiple specialized AI agents collaborating or delegating subtasks to solve a larger problem together."},
+  {cat:"Foundry / AI", q:"What does orchestration mean in agent design?", a:"The logic deciding which agent or tool runs when, and how their results get combined."},
+  {cat:"Foundry / AI", q:"Chatbot vs. agent — what's the difference?", a:"A chatbot just replies conversationally; an agent can also take actions and call tools to complete a task."},
+  {cat:"Foundry / AI", q:"What does 'grounding' mean in AI?", a:"Anchoring model output to verified external or enterprise data, instead of relying on the model's own memory."},
+  {cat:"Foundry / AI", q:"What is a guardrail in an AI system?", a:"A safety control that filters or blocks unsafe, off-topic, or policy-violating input and output."},
+  {cat:"Foundry / AI", q:"What is model drift?", a:"A model's real-world performance degrading over time as live data diverges from its training data."},
+  {cat:"Foundry / AI", q:"GPT models vs. embedding models — what's the difference?", a:"GPT models generate text; embedding models convert text into vectors for search and similarity, not generation."},
+  {cat:"Foundry / AI", q:"What is Azure AI Content Safety?", a:"A service that detects and filters harmful content — hate, violence, self-harm, sexual — in AI inputs and outputs."},
+
+  {cat:"Cloud Core", q:"What is a resource group?", a:"A logical container grouping related Azure resources for management, billing, and access control."},
+  {cat:"Cloud Core", q:"Region vs. Availability Zone?", a:"A region is a geographic area with datacenters; an Availability Zone is a physically separate datacenter within it for fault tolerance."},
+  {cat:"Cloud Core", q:"What is a VNet?", a:"A private, isolated network in Azure where you control IP ranges, subnets, and routing."},
+  {cat:"Cloud Core", q:"What is a Network Security Group (NSG)?", a:"A firewall-like rule set controlling inbound and outbound traffic to subnets or network interfaces."},
+  {cat:"Cloud Core", q:"What is Private Link?", a:"Connects to an Azure PaaS service over a private IP inside your VNet, avoiding public internet exposure."},
+  {cat:"Cloud Core", q:"What is ExpressRoute?", a:"A private, dedicated network connection from on-prem to Azure that bypasses the public internet."},
+  {cat:"Cloud Core", q:"What is Azure Functions?", a:"Serverless, event-triggered compute that runs code without managing infrastructure, billed per execution."},
+  {cat:"Cloud Core", q:"What does Azure API Management do?", a:"A gateway that publishes, secures, throttles, and monitors APIs for consumers."},
+  {cat:"Cloud Core", q:"What is Azure Logic Apps?", a:"A low-code service for building automated workflows that connect apps and services."},
+  {cat:"Cloud Core", q:"What is an SLA?", a:"A contractual uptime or performance guarantee from the cloud provider, e.g. 99.9%."},
+  {cat:"Cloud Core", q:"What is autoscaling?", a:"Automatically adding or removing compute resources based on load or a schedule."},
+  {cat:"Cloud Core", q:"What is a load balancer?", a:"Distributes incoming traffic across multiple instances for availability and performance."},
+  {cat:"Cloud Core", q:"What is a CDN?", a:"A distributed network of edge servers caching content close to users to cut latency."},
+  {cat:"Cloud Core", q:"What is Infrastructure as Code (IaC)?", a:"Defining and provisioning infrastructure through code or config — e.g. Bicep, Terraform — instead of manual clicks."},
+  {cat:"Cloud Core", q:"Bicep vs. Terraform?", a:"Bicep is Azure-native with simpler syntax, Azure-only. Terraform is multi-cloud with a larger ecosystem."},
+  {cat:"Cloud Core", q:"What is a managed identity?", a:"An automatically managed Entra identity for a resource, so it can authenticate to other services without stored credentials."},
+  {cat:"Cloud Core", q:"What is Azure Key Vault?", a:"A managed service for securely storing secrets, keys, and certificates."},
+  {cat:"Cloud Core", q:"What is RBAC?", a:"Role-Based Access Control — assigning permissions to users, groups, or identities by role, scoped to a resource level."},
+  {cat:"Cloud Core", q:"What is Zero Trust?", a:"A security model that verifies every request explicitly, assumes breach, and grants least-privilege access by default."},
+
+  {cat:"DevOps", q:"What is CI/CD?", a:"Continuous Integration — auto build/test on every change — plus Continuous Deployment/Delivery — auto release to environments."},
+  {cat:"DevOps", q:"Azure DevOps vs. GitHub Actions?", a:"Both are CI/CD platforms; Azure DevOps is Microsoft's integrated suite (Boards/Repos/Pipelines), GitHub Actions is native to GitHub repos."},
+  {cat:"DevOps", q:"Build pipeline vs. release pipeline?", a:"A build pipeline compiles and tests code into an artifact; a release pipeline deploys that artifact to target environments."},
+  {cat:"DevOps", q:"What is a container registry?", a:"A repository for storing and versioning container images, e.g. Azure Container Registry."},
+  {cat:"DevOps", q:"What is blue-green deployment?", a:"Running two identical environments and switching traffic between them for zero-downtime releases."},
+  {cat:"DevOps", q:"What is a canary release?", a:"Rolling out a change to a small subset of users first, before a full deployment."},
+  {cat:"DevOps", q:"What is GitOps?", a:"Using a Git repository as the single source of truth for infrastructure and deployment state, synced automatically."},
+
+  {cat:"Architecture", q:"Name the 5 pillars of the Well-Architected Framework.", a:"Reliability, Security, Cost Optimization, Operational Excellence, Performance Efficiency."},
+  {cat:"Architecture", q:"What are the '6 Rs' of cloud migration?", a:"Rehost, Replatform, Repurchase, Refactor, Retire, Retain."},
+  {cat:"Architecture", q:"What is TCO?", a:"Total Cost of Ownership — the full cost of a solution, including infra, licensing, ops, and support, over time."},
+  {cat:"Architecture", q:"What is a landing zone?", a:"A pre-configured, governed Azure environment — networking, identity, policy — that new workloads land into."},
+  {cat:"Architecture", q:"What is a reference architecture?", a:"A proven, reusable design template for a common scenario, adapted to a specific customer."},
+  {cat:"Architecture", q:"What is a non-functional requirement?", a:"A quality constraint — performance, security, scalability — rather than a specific feature."},
+  {cat:"Architecture", q:"What is technical debt?", a:"The implied cost of quick or shortcut solutions that will need rework later."},
+  {cat:"Architecture", q:"High availability vs. disaster recovery?", a:"HA keeps a system running through component failure; DR restores it after a major outage."},
+  {cat:"Architecture", q:"RTO vs. RPO?", a:"RTO = max acceptable downtime to recover. RPO = max acceptable data loss, measured in time."},
+  {cat:"Architecture", q:"What is a single point of failure?", a:"Any component whose failure alone brings down the whole system."},
+  {cat:"Architecture", q:"Vertical vs. horizontal scaling?", a:"Vertical = a bigger machine (scale up). Horizontal = more machines (scale out)."},
+  {cat:"Architecture", q:"What is idempotency, and why does it matter?", a:"An operation that gives the same result no matter how many times it runs — critical for safe retries."},
+  {cat:"Architecture", q:"What is eventual consistency?", a:"A guarantee that all replicas will converge to the same state eventually, not instantly."},
+  {cat:"Architecture", q:"What is the circuit breaker pattern?", a:"Stops calling a failing dependency temporarily to prevent cascading failures."},
+  {cat:"Architecture", q:"Why do you version an API?", a:"To manage changes without breaking existing consumers, e.g. via URL or header versioning."},
+
+  {cat:"Behavioral", q:"How do you handle scope creep on a project?", a:"Document original scope, flag new asks as change requests, get sign-off before absorbing extra work."},
+  {cat:"Behavioral", q:"You disagree with a customer's technical decision — what do you do?", a:"Present the data and risk clearly, offer alternatives, then respect their call — it's their system."},
+  {cat:"Behavioral", q:"How do you keep architecture documentation useful over time?", a:"Keep it living — version it alongside code/IaC in the same repo, update it at every major design decision."},
+  {cat:"Behavioral", q:"How do you estimate a POC timeline?", a:"Scope tightly to one use case, timebox to 2–4 weeks, define clear success criteria upfront."},
+  {cat:"Behavioral", q:"How do you explain a failed POC to a customer?", a:"Be direct about what didn't work and what was learned, then propose a revised path — don't bury the result."},
+  {cat:"Behavioral", q:"You're asked something you don't know in an interview — what do you do?", a:"Say so honestly, explain how you'd find out, then give your best reasoned guess if useful."},
+  {cat:"Behavioral", q:"What makes a good solution architect, beyond technical skill?", a:"Translating business needs into technical decisions and communicating trade-offs clearly to any audience."},
+  {cat:"Behavioral", q:"How do you prioritize competing customer requests?", a:"Tie each to business value and urgency, negotiate a sequence, and be transparent about the trade-offs."},
+  {cat:"Behavioral", q:"How do you stay current with fast-changing Azure/AI services?", a:"Follow Microsoft Learn 'what's new,' release notes, and hands-on labs regularly, not just when you need to."},
+  {cat:"Behavioral", q:"Why does Bahasa Melayu fluency matter for this role?", a:"Direct client-facing engagement with local Malaysian stakeholders — trust and clarity need the local language."}
+];
+
+const glossary = [
+  ["Fabric", "Microsoft's unified SaaS analytics platform on OneLake, wrapping Synapse, ADF and Power BI."],
+  ["OneLake", "Single tenant-wide logical data lake underpinning all Fabric workloads."],
+  ["Foundry", "Unified platform (formerly Azure AI Foundry) for models + agents: catalog, Agent Service, Foundry IQ, eval tools."],
+  ["Agent Service", "Managed runtime for hosting AI agents with identity, memory, tools and observability built in."],
+  ["Foundry IQ", "Unified retrieval layer grounding agents in Work IQ, Fabric IQ, Azure SQL, files and MCP sources."],
+  ["MCP", "Model Context Protocol — open standard for connecting agents to external tools/data."],
+  ["Semantic Kernel", "Open-source SDK for orchestrating AI agents and plugins in code."],
+  ["Entra Agent ID", "Governed identity for AI agents inside Microsoft Entra."],
+  ["RAG", "Retrieval-Augmented Generation — grounding an LLM's answer in retrieved enterprise data."],
+  ["Direct Lake", "Power BI mode reading Delta/Parquet straight from OneLake — no import, no query passthrough."],
+  ["Well-Architected Framework", "Microsoft's five pillars: reliability, security, cost optimization, operational excellence, performance efficiency."],
+  ["POC / MVP", "Proof of Concept proves feasibility narrowly; Minimum Viable Product is a usable, production-viable slice."]
+];
+
+/* ---------------- STATE / STORAGE ---------------- */
+let masteredTech = new Set();
+let masteredQA = new Set();
+let qaOrder = flashcards.map((_,i)=>i);
+let qaIndex = 0;
+let currentFilter = "All";
+
+async function loadProgress(){
+  try{
+    const r = await window.storage.get('sonata-prep-progress');
+    if(r && r.value){
+      const d = JSON.parse(r.value);
+      masteredTech = new Set(d.tech||[]);
+      masteredQA = new Set(d.qa||[]);
+    }
+  }catch(e){ /* no saved progress yet */ }
+  renderStack();
+  renderGlossary();
+  buildFilter();
+  renderCard();
+  updateProgress();
+}
+async function saveProgress(){
+  try{
+    await window.storage.set('sonata-prep-progress', JSON.stringify({
+      tech:[...masteredTech], qa:[...masteredQA]
+    }));
+  }catch(e){ console.error('save failed', e); }
+}
+
+/* ---------------- TABS ---------------- */
+document.getElementById('tabs').addEventListener('click', e=>{
+  const t = e.target.closest('.tab');
+  if(!t) return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+});
+
+/* ---------------- TECH STACK ---------------- */
+function techKey(group,i){ return group+':'+i; }
+function renderStack(){
+  ['core','strong','additional'].forEach(group=>{
+    const el = document.getElementById('stack-'+group);
+    el.innerHTML = '';
+    techStack[group].forEach((item,i)=>{
+      const key = techKey(group,i);
+      const div = document.createElement('div');
+      div.className = 'tech-item' + (masteredTech.has(key) ? ' done' : '');
+      div.innerHTML = `<div class="tech-check">${masteredTech.has(key)?'&#10003;':''}</div>
+        <div class="tech-body"><div class="tech-name">${item.name}</div><div class="tech-desc">${item.desc}</div></div>`;
+      div.addEventListener('click', ()=>{
+        if(masteredTech.has(key)) masteredTech.delete(key); else masteredTech.add(key);
+        renderStack(); updateProgress(); saveProgress();
+      });
+      el.appendChild(div);
+    });
+  });
+}
+
+/* ---------------- GLOSSARY ---------------- */
+function renderGlossary(){
+  const el = document.getElementById('glossary-list');
+  el.innerHTML = glossary.map(([t,d])=>`<dt>${t}</dt><dd>${d}</dd>`).join('');
+}
+
+/* ---------------- FLASHCARDS ---------------- */
+function buildFilter(){
+  const cats = ["All", ...new Set(flashcards.map(c=>c.cat))];
+  const sel = document.getElementById('cat-filter');
+  sel.innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  sel.addEventListener('change', ()=>{
+    currentFilter = sel.value;
+    qaOrder = flashcards.map((_,i)=>i).filter(i=> currentFilter==="All" || flashcards[i].cat===currentFilter);
+    qaIndex = 0;
+    document.getElementById('flashcard').classList.remove('flipped');
+    renderCard();
+  });
+  qaOrder = flashcards.map((_,i)=>i);
+}
+
+function renderCard(){
+  if(qaOrder.length===0){ qaOrder=[0]; }
+  const idx = qaOrder[qaIndex];
+  const c = flashcards[idx];
+  document.getElementById('fc-cat-front').textContent = c.cat;
+  document.getElementById('fc-cat-back').textContent = masteredQA.has(idx) ? 'ANSWER · MASTERED' : 'ANSWER';
+  document.getElementById('fc-question').textContent = c.q;
+  document.getElementById('fc-answer').textContent = c.a;
+  document.getElementById('qa-counter').textContent = (qaIndex+1)+' / '+qaOrder.length;
+  document.getElementById('mastered-btn').style.color = masteredQA.has(idx) ? 'var(--bg)' : 'var(--green)';
+  document.getElementById('mastered-btn').style.background = masteredQA.has(idx) ? 'var(--green)' : 'var(--panel)';
+}
+
+document.getElementById('flashcard').addEventListener('click', ()=>{
+  document.getElementById('flashcard').classList.toggle('flipped');
+});
+document.getElementById('next-btn').addEventListener('click', ()=>{
+  qaIndex = (qaIndex+1) % qaOrder.length;
+  document.getElementById('flashcard').classList.remove('flipped');
+  renderCard();
+});
+document.getElementById('prev-btn').addEventListener('click', ()=>{
+  qaIndex = (qaIndex-1+qaOrder.length) % qaOrder.length;
+  document.getElementById('flashcard').classList.remove('flipped');
+  renderCard();
+});
+document.getElementById('shuffle-btn').addEventListener('click', ()=>{
+  for(let i=qaOrder.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [qaOrder[i],qaOrder[j]] = [qaOrder[j],qaOrder[i]];
+  }
+  qaIndex = 0;
+  document.getElementById('flashcard').classList.remove('flipped');
+  renderCard();
+});
+document.getElementById('mastered-btn').addEventListener('click', ()=>{
+  const idx = qaOrder[qaIndex];
+  if(masteredQA.has(idx)) masteredQA.delete(idx); else masteredQA.add(idx);
+  renderCard(); updateProgress(); saveProgress();
+});
+document.getElementById('reset-btn').addEventListener('click', ()=>{
+  masteredTech.clear(); masteredQA.clear();
+  renderStack(); renderCard(); updateProgress(); saveProgress();
+});
+
+/* ---------------- PROGRESS ---------------- */
+function updateProgress(){
+  const totalTech = techStack.core.length + techStack.strong.length + techStack.additional.length;
+  const total = totalTech + flashcards.length;
+  const done = masteredTech.size + masteredQA.size;
+  document.getElementById('progress-label').textContent = done + ' / ' + total + ' mastered';
+  document.getElementById('progress-fill').style.width = (total? (done/total*100) : 0) + '%';
+}
+
+loadProgress();
+</script>
+</body>
+</html>
