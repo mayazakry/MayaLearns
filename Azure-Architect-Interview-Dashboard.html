@@ -214,7 +214,7 @@ button{font-family:inherit;}
 .tab.active{color:var(--azure); border-color:var(--azure);}
 
 /* Flashcard */
-.flash-wrap{perspective:1200px; height:220px;}
+.flash-wrap{perspective:1200px; height:260px;}
 .flash-card{
   width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform .5s;
   cursor:pointer;
@@ -223,9 +223,13 @@ button{font-family:inherit;}
 .flash-face{
   position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--radius);
   border:1px solid var(--line); background:var(--surface); padding:18px; display:flex; flex-direction:column;
-  justify-content:center; align-items:center; text-align:center; gap:10px;
+  justify-content:center; align-items:center; text-align:center; gap:10px; overflow-y:auto;
 }
 .flash-face.back{transform:rotateY(180deg); background:var(--surface2);}
+.flash-detail{
+  margin-top:6px; padding-top:12px; border-top:1px dashed var(--line); width:100%;
+  font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.6; text-align:left;
+}
 
 /* Question card */
 .q-card{background:var(--surface); border:none; border-radius:var(--radius); padding:16px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.18);}
@@ -465,6 +469,7 @@ const ICONS = {
 /* ---------------- AZURE / FABRIC SERVICE LIBRARY ---------------- */
 const AZURE_SERVICES = [
 {id:'az-sql-db', name:'Azure SQL Database', cat:'Data Platform · OLTP',
+ short:'Managed SQL database — no server ops needed.',
  purpose:'Fully managed PaaS relational database (SQL Server engine) for transactional and light analytical workloads, with built-in HA, patching, and elastic scaling.',
  when:'Line-of-business apps, MES/ERP-adjacent transactional stores, departmental reporting marts, systems needing built-in backup/HA without managing a VM.',
  whenNot:'Massive-scale analytical workloads over TBs of history (use Fabric Warehouse/Synapse), or when you need full OS-level control / SQL Server features not yet in PaaS (use Managed Instance or SQL on VM).',
@@ -476,6 +481,7 @@ const AZURE_SERVICES = [
  mistake:'Treating Azure SQL DB as a drop-in replacement for on-prem SQL Server without checking feature parity (SQL Agent, CLR, cross-db queries).'},
 
 {id:'az-adf', name:'Azure Data Factory', cat:'Data Platform · Orchestration & ETL',
+ short:'Cloud orchestrator that moves and transforms data.',
  purpose:'Cloud ETL/ELT and orchestration service — pipelines, activities, triggers, integration runtimes — for moving and transforming data across 100+ connectors.',
  when:'Orchestrating multi-source ingestion (SAP, on-prem SQL, files, APIs) into a lake or warehouse; scheduling and monitoring complex dependency chains; hybrid connectivity via Self-Hosted Integration Runtime.',
  whenNot:'Pure in-lake, code-first transformation at scale where Spark-native tooling (Databricks/Fabric notebooks) is a better fit for complex transformation logic, or very lightweight single-source copies where Fabric Data Pipelines/Dataflow Gen2 alone suffice.',
@@ -485,6 +491,7 @@ const AZURE_SERVICES = [
  mistake:'Using ADF Mapping Data Flows for everything instead of recognizing when a Databricks/Fabric notebook is more maintainable for complex logic.'},
 
 {id:'az-databricks', name:'Azure Databricks', cat:'Data Platform · Big Data & ML',
+ short:'Managed Spark for big data and ML at scale.',
  purpose:'Managed Apache Spark platform (Delta Lake, Unity Catalog, MLflow) for large-scale data engineering, data science, and ML at scale.',
  when:'Heavy transformation logic, large-scale joins/aggregations, ML model training, streaming with Structured Streaming, teams wanting notebook-first collaborative engineering with strong governance via Unity Catalog.',
  whenNot:'Simple ELT that Fabric Dataflow Gen2/Pipelines or SQL can handle — spinning up Spark clusters for small jobs is wasteful; or when the org has standardized fully on Fabric and wants a single-pane SaaS experience.',
@@ -494,6 +501,7 @@ const AZURE_SERVICES = [
  mistake:'Leaving clusters running / no auto-termination policy — the single most common cause of runaway Databricks cost.'},
 
 {id:'ms-fabric', name:'Microsoft Fabric', cat:'Unified Analytics Platform',
+ short:'One SaaS platform for data and BI, one lake.',
  purpose:'SaaS, unified analytics platform combining Data Factory, Synapse (Data Engineering, Data Science, Data Warehouse, Real-Time Intelligence), and Power BI on one lake (OneLake) with one capacity/billing model.',
  when:'Organizations wanting a single governed platform from ingestion to BI without stitching together separate services; teams already invested in Power BI; scenarios where "one copy of data, many engines" (via OneLake + Delta/Parquet) reduces duplication.',
  whenNot:'Highly specialized ML/MLOps shops needing Databricks-grade tooling, or multi-cloud shops that don\'t want Microsoft-only lock-in, or workloads needing capabilities Fabric hasn\'t matured yet (case-by-case check at interview time).',
@@ -503,6 +511,7 @@ const AZURE_SERVICES = [
  mistake:'Assuming Fabric is "just Power BI renamed" — it\'s a full analytics platform; conflating the two loses credibility with technical stakeholders.'},
 
 {id:'onelake', name:'OneLake', cat:'Fabric · Storage Foundation',
+ short:'One shared lake every Fabric engine reads from.',
  purpose:'The single, tenant-wide, multi-cloud-capable data lake underneath every Fabric workload — one logical copy of data in open Delta Parquet format that all Fabric engines read/write directly.',
  when:'Any Fabric implementation — it\'s the default, always-on foundation. Explicitly leveraged when designing to avoid data duplication across Lakehouse, Warehouse, Power BI, and Data Science items.',
  whenNot:'N/A as a default — but architects should still decide organizational structure (workspaces, domains, shortcuts) rather than dumping everything into one workspace.',
@@ -512,6 +521,7 @@ const AZURE_SERVICES = [
  mistake:'Not designing a workspace/domain structure up front — "everything in one workspace" becomes ungovernable fast.'},
 
 {id:'fabric-lakehouse', name:'Fabric Lakehouse', cat:'Fabric · Data Engineering',
+ short:'Flexible lake storage — files and SQL, one place.',
  purpose:'A Fabric item combining lake-style file storage with a SQL analytics endpoint — Delta tables queryable both as files (Spark/notebooks) and as tables (SQL), on OneLake.',
  when:'Landing and transforming semi-structured/structured data with Spark/notebooks, schema-on-read flexibility, data science workloads, and when you want both programmatic (PySpark) and SQL access to the same tables.',
  whenNot:'When the workload is purely relational/BI-serving with heavy concurrent SQL users needing full T-SQL feature parity and strict schema enforcement — a Fabric Warehouse is the better serving layer.',
@@ -521,6 +531,7 @@ const AZURE_SERVICES = [
  mistake:'Building all transformation logic in the SQL endpoint instead of using Spark/notebooks — fighting the tool\'s strength.'},
 
 {id:'fabric-warehouse', name:'Fabric Data Warehouse', cat:'Fabric · Data Warehousing',
+ short:'Full T-SQL warehouse, built on the lake.',
  purpose:'A fully transactional, T-SQL-native data warehouse in Fabric, built on OneLake/Delta under the hood, giving classic warehouse guarantees (ACID, stored procs, full DML) with lake-scale storage.',
  when:'Gold-layer serving for BI with strict schema, multi-table transactions, stored procedures, cross-database queries within Fabric, and teams with strong existing T-SQL skillsets.',
  whenNot:'Highly flexible/exploratory data science work better suited to notebooks, or when raw/semi-structured ingestion is the primary need (that\'s Lakehouse territory).',
@@ -530,6 +541,7 @@ const AZURE_SERVICES = [
  mistake:'Forgetting that Warehouse data is still Delta under the hood and re-inventing ETL pipelines to "export" it elsewhere unnecessarily.'},
 
 {id:'direct-lake', name:'Direct Lake (Power BI)', cat:'Fabric · BI Serving Mode',
+ short:'Power BI reads live lake data, no import step.',
  purpose:'A Power BI storage mode that reads Delta tables directly from OneLake into memory on demand — combining Import mode\'s query speed with DirectQuery\'s always-fresh data, without a separate refresh/import step.',
  when:'Large Fabric-native datasets where you want near-real-time freshness and fast query performance without scheduling imports, especially over Lakehouse/Warehouse gold tables.',
  whenNot:'Small datasets where plain Import mode is simpler and sufficient, or sources outside OneLake\'s Delta format (falls back to DirectQuery/Import for those).',
@@ -539,6 +551,7 @@ const AZURE_SERVICES = [
  mistake:'Assuming Direct Lake works over any data source — it specifically requires Delta-format tables in OneLake.'},
 
 {id:'dataflow-gen2', name:'Dataflow Gen2', cat:'Fabric · Low-Code ETL',
+ short:'Low-code Power Query ETL into Fabric.',
  purpose:'Power Query-based, low-code data transformation experience in Fabric for business/citizen-integrator-friendly ETL, output-able directly into Lakehouse/Warehouse destinations.',
  when:'Self-service or lightly technical transformation needs, quick prototyping of a data pipeline, analysts who know Power Query from Excel/Power BI wanting to build reusable ETL without writing Spark code.',
  whenNot:'Complex, high-volume transformation logic better handled in Spark notebooks for performance and maintainability; or when transformation logic needs to be source-controlled/tested like real code.',
@@ -548,6 +561,7 @@ const AZURE_SERVICES = [
  mistake:'Letting citizen-developed Dataflow Gen2 pipelines multiply ungoverned — they need the same cataloging/ownership discipline as engineered pipelines.'},
 
 {id:'rti', name:'Real-Time Intelligence', cat:'Fabric · Streaming Analytics',
+ short:'Streams and queries real-time data with KQL.',
  purpose:'Fabric\'s suite for ingesting, querying (KQL), and acting on streaming/event data — eventstreams, KQL databases, and real-time dashboards/alerts — for high-velocity data like IoT/telemetry.',
  when:'Manufacturing/IoT sensor telemetry, real-time equipment monitoring, anomaly/alerting scenarios, log analytics, any scenario where "as-it-happens" matters more than daily batch.',
  whenNot:'Traditional batch reporting where daily/hourly freshness is genuinely sufficient — streaming infrastructure adds operational complexity that isn\'t justified without a real latency requirement.',
@@ -557,6 +571,7 @@ const AZURE_SERVICES = [
  mistake:'Reaching for streaming architecture as a default "modern" choice without validating an actual sub-minute latency requirement.'},
 
 {id:'synapse', name:'Azure Synapse Analytics', cat:'Data Platform · Enterprise Warehouse',
+ short:'Older unified analytics service, now succeeded by Fabric.',
  purpose:'Azure\'s prior-generation unified analytics service (dedicated/serverless SQL pools, Spark pools, pipelines) — still widely deployed in existing enterprises, now positioned alongside/being succeeded by Fabric.',
  when:'Existing enterprise estates already on Synapse with dedicated SQL pools; scenarios requiring capabilities not yet at parity in Fabric; large existing investments where migration isn\'t yet justified.',
  whenNot:'New greenfield builds, where Fabric is now Microsoft\'s recommended unified path for most new analytics platforms.',
@@ -566,6 +581,7 @@ const AZURE_SERVICES = [
  mistake:'Conflating Synapse and Fabric in conversation as if interchangeable — interviewers will probe whether you know the distinction and the migration story.'},
 
 {id:'cosmos-db', name:'Azure Cosmos DB', cat:'Data Platform · NoSQL / Global Scale',
+ short:'Global NoSQL database, single-digit-ms latency.',
  purpose:'Globally distributed, multi-model NoSQL database with single-digit-millisecond latency SLAs, tunable consistency, and multiple APIs (NoSQL, MongoDB, Cassandra, Gremlin, Table).',
  when:'Global low-latency apps, IoT device state/telemetry at massive scale, catalog/session data, scenarios needing elastic horizontal scale and flexible schema.',
  whenNot:'Complex relational/transactional reporting workloads, or when strong multi-row ACID transactions across partitions and rich ad-hoc SQL joins are the primary requirement (use a relational engine).',
@@ -575,6 +591,7 @@ const AZURE_SERVICES = [
  mistake:'Choosing a poor partition key (e.g. low-cardinality or hot-partition-prone) — the single most common Cosmos DB design failure.'},
 
 {id:'ai-search', name:'Azure AI Search', cat:'AI · Retrieval / RAG',
+ short:'Search-as-a-service — the retrieval layer for RAG.',
  purpose:'Managed search-as-a-service with vector, keyword, and hybrid search, semantic ranking, and indexers — the standard retrieval layer for enterprise RAG architectures.',
  when:'Building the retrieval component of a RAG chatbot/knowledge assistant, enterprise document search, hybrid keyword+semantic search over unstructured content.',
  whenNot:'Simple structured lookups better served by SQL, or extremely small document sets where a lighter-weight vector store might suffice for a prototype.',
@@ -584,6 +601,7 @@ const AZURE_SERVICES = [
  mistake:'Treating retrieval as an afterthought — RAG quality is dominated by chunking/indexing design far more than by which LLM is used.'},
 
 {id:'azure-openai', name:'Azure OpenAI Service', cat:'AI · Foundation Models',
+ short:'Enterprise-hosted OpenAI models with Azure compliance.',
  purpose:'Enterprise-grade, Azure-hosted access to OpenAI models (GPT family, embeddings, etc.) with Azure networking, RBAC, private endpoints, and compliance boundaries.',
  when:'Enterprise generative AI scenarios needing data residency, private networking, and compliance guarantees that public OpenAI API doesn\'t offer; embedding generation for RAG; chat/completion workloads.',
  whenNot:'Rapid personal prototyping with no enterprise compliance need, where the public OpenAI API might be faster to start with; or scenarios needing a model not available in Azure OpenAI\'s catalog.',
@@ -593,6 +611,7 @@ const AZURE_SERVICES = [
  mistake:'Not planning for TPM/RPM quota limits until production — leads to throttling surprises under real user load.'},
 
 {id:'ai-foundry', name:'Azure AI Foundry', cat:'AI · Platform / Orchestration',
+ short:'One platform to build, test, and monitor AI apps.',
  purpose:'Unified platform (formerly AI Studio) for building, evaluating, deploying, and monitoring AI applications and agents — model catalog, prompt flow, evaluation, and agent orchestration in one workspace.',
  when:'Standing up an end-to-end generative AI application/agent lifecycle — model selection, prompt engineering/testing, evaluation, deployment, and monitoring — especially multi-model or agentic scenarios.',
  whenNot:'A single simple API call to one model with no evaluation/lifecycle need — Foundry\'s value is in the full lifecycle tooling, which is overhead if you don\'t need it yet.',
@@ -602,15 +621,18 @@ const AZURE_SERVICES = [
  mistake:'Skipping systematic evaluation entirely and shipping a GenAI feature on "it looked good in testing" — the most common way enterprise AI pilots lose stakeholder trust.'},
 
 {id:'azure-ml', name:'Azure Machine Learning', cat:'AI · Classical ML / MLOps',
+ short:'End-to-end platform to train and deploy ML models.',
  purpose:'End-to-end platform for training, tracking, deploying, and monitoring classical/deep-learning ML models — experiment tracking, pipelines, model registry, managed endpoints.',
  when:'Predictive/classical ML use cases (predictive maintenance, quality/defect prediction, demand forecasting) needing full MLOps: reproducible training, versioning, CI/CD for models, and monitored deployment.',
  whenNot:'Pure generative AI/LLM application work with no custom model training — that leans more on Azure OpenAI/AI Foundry than Azure ML\'s classical ML tooling.',
  pros:['Full experiment tracking and model versioning','Managed compute for training and inference','Native MLOps: pipelines, registries, CI/CD integration','Supports open-source frameworks (PyTorch, scikit-learn, etc.)'],
  cons:['Overkill for very simple/one-off models','Requires real MLOps discipline to get value — easy to under-use'],
- qa:[{q:'Given your manufacturing background, describe a predictive maintenance architecture using Azure ML.', a30:'Sensor telemetry lands in a lakehouse, features get engineered in Spark/notebooks, a model is trained and tracked in Azure ML, registered, and deployed to a managed endpoint that scores incoming telemetry in near-real time to flag at-risk equipment.', a2:'I\'d design it as a closed loop: equipment sensor data streams or batches into a Fabric Lakehouse, where I engineer features — rolling vibration averages, temperature trends, cycle counts — in a notebook. I train candidate models in Azure ML, using its experiment tracking to compare approaches objectively rather than picking the first one that looks decent, then register the winning model in the Azure ML model registry with full lineage back to the training data and code version. For scoring, I\'d deploy to a managed online endpoint if maintenance teams need near-real-time flags, or a batch endpoint scored nightly if daily is sufficient — that decision hinges on how fast the business can actually act on a flag. Critically, I\'d set up data drift monitoring, because equipment behavior and sensor calibration shift over time, and an unmonitored model silently degrades.', follow:'How would you decide between a batch and a real-time (online) scoring endpoint here?', mistake:'Deploying a model with no drift/performance monitoring — the model quietly degrades and nobody notices until it\'s visibly wrong.'}],
+ qa:[{q:'Given your manufacturing background, describe a predictive maintenance architecture using Azure ML.', a30:'Sensor telemetry lands in a lakehouse, features get engineered in Spark/notebooks, a model is trained and tracked in Azure ML, registered, and deployed to a managed endpoint that scores incoming telemetry in near-real time to flag at-risk equipment.', a2:'I\'d design it as a closed loop: equipment sensor data streams or batches into a Fabric Lakehouse, where I engineer features — rolling vibration averages, temperature trends, cycle counts — in a notebook. I train candidate models in Azure ML, using its experiment tracking to compare approaches objectively rather than picking the first one that looks decent, then register the winning model in the Azure ML model registry with full lineage back to the training data and code version. For scoring, I\'d deploy to a managed online endpoint if maintenance teams need near-real-time flags, or a batch endpoint scored nightly if daily is sufficient — that decision hinges on how fast the business can actually act on a flag. Critically, I\'d set up data drift monitoring, because equipment behavior and sensor calibration shift over time, and an unmonitored model silently degrades.', follow:'How would you decide between a batch and a real-time (online) scoring endpoint here?', mistake:'Deploying a model with no drift/performance monitoring — the model quietly degrades and nobody notices until it\'s visibly wrong.'},
+  {q:'How would you set up CI/CD so a model retrains automatically when Azure ML detects drift?', a30:'A drift-monitoring job triggers an Azure ML pipeline via Azure DevOps/GitHub Actions, which retrains on fresh data, re-evaluates against a holdout set, and only promotes the new model to the registry if it beats the current one on the agreed metric.', a2:'I treat this as an event-driven MLOps pipeline, not a manual chore. A scheduled Azure ML data-drift monitor compares live scoring data against the training baseline; when drift crosses a threshold, it fires a webhook that kicks off a retraining pipeline defined as code (Azure ML pipeline YAML, orchestrated via Azure DevOps or GitHub Actions). That pipeline pulls the latest labeled data, retrains, and — critically — evaluates the new candidate against the same holdout test set and business metric as the current production model before it\'s allowed to be promoted; I never auto-promote on drift alone, only on demonstrated improvement. The registry keeps both versions with full lineage, so if the new model underperforms in the field, rolling back to the prior registered version is a one-step action, not a fire drill.', follow:'What metric would you gate promotion on if false negatives are costlier than false positives for this use case?', mistake:'Auto-promoting any retrained model straight to production on a schedule without an evaluation gate — drift-triggered retraining without re-validation can silently ship a worse model.'}],
  mistake:'Skipping the "how does the business actually act on this prediction" question — a beautifully accurate model nobody acts on delivers zero value.'},
 
 {id:'az-functions', name:'Azure Functions', cat:'App Platform · Serverless Compute',
+ short:'Serverless, event-triggered compute — pay per run.',
  purpose:'Event-driven, serverless compute for small, stateless units of logic — triggered by HTTP, queues, timers, blob events, etc. — billed per execution.',
  when:'Lightweight glue logic — a webhook handler, a small transformation triggered by a blob landing, an API endpoint for a chatbot backend, orchestrating calls between services in an event-driven architecture.',
  whenNot:'Long-running processes, complex stateful workflows (use Durable Functions or Logic Apps instead), or heavy compute better suited to a dedicated service/container.',
@@ -620,6 +642,7 @@ const AZURE_SERVICES = [
  mistake:'Building complex, long-running stateful workflows in plain Functions instead of reaching for Durable Functions or Logic Apps.'},
 
 {id:'purview', name:'Microsoft Purview', cat:'Governance · Data Catalog & Compliance',
+ short:'Governance: catalog, lineage, and data classification.',
  purpose:'Unified data governance — catalog, data map, lineage, classification, and access policy — spanning Azure, Fabric, on-prem, and multi-cloud sources.',
  when:'Any enterprise architecture needing data discoverability, lineage tracing, sensitive-data classification (PII, financial), and centralized access policy across a growing multi-source estate.',
  whenNot:'Very small, single-source proof-of-concept builds where formal governance overhead isn\'t yet justified — though it\'s worth flagging as a "phase 2" even then.',
@@ -629,6 +652,7 @@ const AZURE_SERVICES = [
  mistake:'Deferring governance to "later" on every project — by the time it\'s painful, there\'s a large ungoverned estate to retrofit.'},
 
 {id:'entra-rbac', name:'Entra ID & RBAC', cat:'Governance · Identity & Access',
+ short:'Identity and role-based access across Azure and Fabric.',
  purpose:'Microsoft Entra ID (formerly Azure AD) is the identity backbone for authentication; Azure RBAC and Fabric workspace roles control who can do what, on which resources, at which scope.',
  when:'Every architecture — identity and least-privilege access design is a foundational, non-optional part of any solution, not an afterthought bolted on before go-live.',
  whenNot:'N/A — the question is always "how," not "whether." (Interviewers listen for whether you treat this as default, not optional.)',
@@ -641,6 +665,7 @@ const AZURE_SERVICES = [
 /* ---------------- SAP LANDSCAPE ---------------- */
 const SAP_TOPICS = [
 {id:'sap-ecc-s4', name:'SAP ECC vs S/4HANA', cat:'SAP · Core ERP',
+ short:'ECC is legacy SAP; S/4HANA is modern and real-time.',
  purpose:'ECC is SAP\'s legacy ERP running on any DB (often Oracle/DB2); S/4HANA is the modern ERP suite built natively for the in-memory HANA database, with simplified data models and real-time analytics built in.',
  when:'Understanding which generation a client runs shapes your entire extraction strategy — S/4HANA exposes richer, more real-time extraction options (CDS views) than classic ECC.',
  whenNot:'N/A — you always need to know this before designing any SAP integration.',
@@ -650,6 +675,7 @@ const SAP_TOPICS = [
  mistake:'Designing an extraction architecture without first confirming ECC vs S/4HANA and on-prem vs cloud — it changes the whole approach.'},
 
 {id:'sap-bw-datasphere', name:'SAP BW/BW4HANA & Datasphere', cat:'SAP · Analytics Layer',
+ short:'BW is classic SAP\'s DW; Datasphere is its cloud successor.',
  purpose:'BW/BW4HANA is SAP\'s traditional data warehouse layer on top of ECC/S4; SAP Datasphere is the newer cloud data fabric/warehouse product positioned to unify SAP and non-SAP data with governed semantic sharing.',
  when:'When a client already has significant BW investment (InfoProviders, queries) and you need to decide whether to extract from BW, extract from the source system directly, or use Datasphere as a semantic bridge.',
  whenNot:'Greenfield non-SAP-centric analytics platforms with no BW investment — extracting straight from S/4HANA CDS views may be simpler than going through BW.',
@@ -659,6 +685,7 @@ const SAP_TOPICS = [
  mistake:'Underestimating how much undocumented business logic lives inside BW transformations — rebuilding it from scratch from raw tables is riskier than it looks.'},
 
 {id:'sap-cdc-odp', name:'SAP Extraction: ODP, CDS Views, CDC, Delta Loads', cat:'SAP · Integration Mechanics',
+ short:'How SAP data gets extracted fast, via delta loads.',
  purpose:'The core mechanics for getting data out of SAP efficiently: ODP (Operational Data Provisioning) as a standard extraction framework, CDS views for modern semantically-rich extracts, and CDC/delta mechanisms to avoid full reloads.',
  when:'Any recurring SAP-to-cloud integration — daily/hourly loads should use delta/CDC patterns, not full table reloads, once data volume is non-trivial.',
  whenNot:'One-time historical backfills, where a full load is simpler and delta complexity isn\'t worth it for a single run.',
@@ -668,6 +695,7 @@ const SAP_TOPICS = [
  mistake:'Defaulting to full reloads "because it\'s simpler" once data volume makes that operationally expensive or disruptive to the source SAP system.'},
 
 {id:'sap-fabric-integration', name:'SAP + Fabric/Databricks/Power BI Integration Patterns', cat:'SAP · Architecture Patterns',
+ short:'The full path: SAP into lakehouse into Power BI.',
  purpose:'The end-to-end pattern for landing SAP data into a modern lakehouse and serving it through BI: connector choice, integration runtime, medallion layering, and semantic modeling.',
  when:'Designing the full path from SAP source system to a trusted, governed Power BI report or AI application.',
  whenNot:'N/A — this is the core architecture pattern question for any SAP-adjacent role like the one being interviewed for.',
@@ -680,39 +708,51 @@ const SAP_TOPICS = [
 /* ---------------- AI / RAG GLOSSARY ---------------- */
 const AI_TOPICS = [
 {id:'ai-llm', term:'LLM (Large Language Model)', def:'A neural network trained on massive text corpora to predict the next token, giving it broad language understanding and generation ability. GPT, Claude, and similar models are LLMs.',
+ short:'Predicts the next word from patterns — not a lookup.',
  angle:'In interviews, don\'t describe LLMs as "databases of facts" — they generate plausible text based on patterns, which is exactly why grounding (RAG) matters for factual enterprise use cases.',
  pitfall:'Saying an LLM "looks up" answers — it generates them statistically, which is the root cause of hallucination.'},
 {id:'ai-rag', term:'RAG (Retrieval-Augmented Generation)', def:'An architecture pattern where relevant documents are retrieved (e.g. via Azure AI Search) and injected into the LLM\'s prompt as context, grounding its answer in real, current, enterprise-specific data instead of relying only on training data.',
+ short:'Feeds an LLM real documents so it answers accurately.',
  angle:'Frame RAG as the answer to "how do you keep an LLM accurate and current without retraining it" — it\'s the standard enterprise pattern and you should be able to sketch the pipeline (ingest → chunk → embed → index → retrieve → generate) fluently.',
  pitfall:'Presenting RAG as a solved problem — retrieval quality, chunking strategy, and evaluation are still real engineering challenges.'},
 {id:'ai-embeddings', term:'Embeddings', def:'Numeric vector representations of text (or images) that capture semantic meaning, such that semantically similar content produces vectors that are close together in vector space.',
+ short:'Turns text into vectors so meaning can be compared.',
  angle:'Explain simply: embeddings let a computer measure "how similar in meaning" two pieces of text are, which is what powers semantic/vector search in RAG.',
  pitfall:'Confusing embeddings with keyword search — embeddings capture meaning, not just exact word matches, which is why hybrid search combines both.'},
 {id:'ai-tokens', term:'Tokens', def:'The basic units (roughly word-pieces) that LLMs process text in; both input prompts and outputs are measured, priced, and limited by token count.',
+ short:'Word-pieces that LLMs are priced and limited by.',
  angle:'Useful for cost/architecture conversations — explain that prompt length (including retrieved RAG context) directly drives cost and latency, so chunking/retrieval efficiency has real cost implications.',
  pitfall:'Not being able to explain why "just add more context" isn\'t free — it\'s a real cost and latency tradeoff.'},
 {id:'ai-vectordb', term:'Vector Database', def:'A database optimized for storing and querying high-dimensional embedding vectors via similarity search (e.g. Azure AI Search vector index, Cosmos DB vector search, pgvector for PostgreSQL).',
+ short:'A database built to search embedding vectors fast.',
  angle:'Know at least three options and their tradeoffs: Azure AI Search (best for enterprise RAG, hybrid search, semantic ranking), Cosmos DB vector search (if data\'s already in Cosmos), pgvector (lightweight, good if already on Postgres).',
  pitfall:'Treating "vector database" as one interchangeable commodity choice — indexing performance, hybrid search support, and operational fit vary a lot.'},
 {id:'ai-hallucination', term:'Hallucination', def:'When an LLM generates plausible-sounding but factually incorrect or fabricated content, because it\'s producing statistically likely text, not verified facts.',
+ short:'When an LLM confidently makes facts up.',
  angle:'Show you understand mitigation, not just the definition: grounding via RAG, instructing the model to answer only from provided context, citation requirements, and evaluation/monitoring for ungrounded answers.',
  pitfall:'Claiming any single technique "eliminates" hallucination — the honest, senior answer is that you reduce and monitor for it, not eliminate it entirely.'},
 {id:'ai-grounding', term:'Grounding', def:'The practice of anchoring an LLM\'s output in verifiable source data (via RAG context, tool calls, or structured data) rather than relying solely on its parametric/trained knowledge.',
+ short:'Anchoring AI answers in real, verifiable data.',
  angle:'Connect directly to your RAG pipeline explanation — grounding is the goal, RAG is one mechanism to achieve it.',
  pitfall:'Using "grounding" and "RAG" as if perfectly synonymous — grounding is the broader goal; RAG is one implementation of it (tool-calling/function-calling is another).'},
 {id:'ai-promptengineering', term:'Prompt Engineering', def:'The practice of designing inputs (system instructions, examples, structure) to reliably steer an LLM\'s output toward the desired behavior, format, and accuracy.',
+ short:'Designing inputs to reliably steer AI output.',
  angle:'Be ready to describe concrete techniques: clear role/system instructions, few-shot examples, explicit output format requirements, chain-of-thought style reasoning prompts, and instructing the model to say "I don\'t know" when context is insufficient.',
  pitfall:'Treating prompt engineering as a one-time task rather than an iterative, tested, versioned part of the system (which is exactly what Prompt Flow/AI Foundry evaluation exists to support).'},
 {id:'ai-finetuning', term:'Fine-Tuning', def:'Further training a pre-trained model on a smaller, task-specific dataset to adapt its behavior/style/domain knowledge, as opposed to just prompting it at inference time.',
+ short:'Retrains a model\'s style, not its facts.',
  angle:'Know the RAG-vs-fine-tuning decision: RAG is usually better for injecting current/factual/enterprise knowledge cheaply; fine-tuning is better for changing style/format/behavior patterns, not for keeping facts current.',
  pitfall:'Recommending fine-tuning to "teach the model new facts" — that\'s almost always better solved with RAG; fine-tuning doesn\'t reliably encode current, updatable facts.'},
 {id:'ai-agents', term:'AI Agents', def:'LLM-driven systems that can plan, call tools/functions, and take multi-step actions autonomously toward a goal, rather than just producing a single text response.',
+ short:'AI that plans and takes multi-step actions itself.',
  angle:'Distinguish agents from simple RAG chatbots: an agent might query a database, call an API, and synthesize a plan across multiple tool calls, not just retrieve-and-answer once.',
  pitfall:'Overselling agent autonomy in an enterprise context without mentioning guardrails — human-in-the-loop approval steps matter for anything with real-world side effects.'},
 {id:'ai-mcp', term:'MCP (Model Context Protocol)', def:'An open protocol that standardizes how AI applications connect to external tools, data sources, and systems, so integrations can be built once and reused across different AI applications/agents.',
+ short:'Open standard connecting AI to tools and data.',
  angle:'Position it as the emerging standard for tool/data integration in agentic AI systems — reduces bespoke integration work when connecting an LLM to enterprise systems.',
  pitfall:'Confusing MCP with RAG — MCP is about standardizing tool/data connectivity for agents; RAG is a retrieval pattern for grounding generation.'},
 {id:'ai-responsible', term:'Responsible AI (Safety, Evaluation, Monitoring)', def:'The set of practices ensuring AI systems are safe, fair, transparent, and monitored in production — content filtering, bias evaluation, groundedness checks, and human oversight.',
+ short:'Keeping AI safe, fair, and monitored in production.',
  angle:'Enterprise interviewers care about this — mention Azure OpenAI\'s built-in content filtering, groundedness detection, and the discipline of ongoing evaluation, not just launch-day testing.',
  pitfall:'Treating responsible AI as a legal/compliance checkbox instead of an architecture concern (e.g. content filters, PII redaction, human review for high-stakes outputs).'},
 ];
@@ -1503,9 +1543,9 @@ function renderMock(){
 /* ---------------- PAGE: FLASHCARDS ---------------- */
 function buildFlashDeck(){
   const cards = [];
-  AZURE_SERVICES.forEach(s=>cards.push({id:'fc-'+s.id, front:s.name, back:s.purpose, tag:'Azure'}));
-  SAP_TOPICS.forEach(s=>cards.push({id:'fc-'+s.id, front:s.name, back:s.purpose, tag:'SAP'}));
-  AI_TOPICS.forEach(s=>cards.push({id:'fc-'+s.id, front:s.term, back:s.def, tag:'AI'}));
+  AZURE_SERVICES.forEach(s=>cards.push({id:'fc-'+s.id, front:s.name, back:s.short||s.purpose, detail:s.short?s.purpose:null, tag:'Azure'}));
+  SAP_TOPICS.forEach(s=>cards.push({id:'fc-'+s.id, front:s.name, back:s.short||s.purpose, detail:s.short?s.purpose:null, tag:'SAP'}));
+  AI_TOPICS.forEach(s=>cards.push({id:'fc-'+s.id, front:s.term, back:s.short||s.def, detail:s.short?s.def:null, tag:'AI'}));
   return cards;
 }
 let FLASH_DECK = [];
@@ -1532,7 +1572,7 @@ function renderFlashcards(){
     <div class="flash-wrap">
       <div class="flash-card ${window.__flashFlipped?'flipped':''}" onclick="window.__flashFlipped=!window.__flashFlipped; renderPage();">
         <div class="flash-face"><div class="eyebrow" style="color:${CAT_COLORS[card.tag]||'var(--azure)'};">${card.tag}</div><div style="font-size:19px;font-weight:700;margin-top:10px;">${esc(card.front)}</div><div class="card-sub" style="margin-top:12px;">Click to reveal</div></div>
-        <div class="flash-face back"><div style="font-size:13.5px;line-height:1.6;">${esc(card.back)}</div></div>
+        <div class="flash-face back"><div style="font-size:16.5px;font-weight:700;line-height:1.4;">${esc(card.back)}</div>${card.detail?`<div class="flash-detail">${esc(card.detail)}</div>`:''}</div>
       </div>
     </div>
     <div style="display:flex;justify-content:space-between;margin-top:16px;gap:8px;">
