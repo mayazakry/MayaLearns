@@ -230,6 +230,10 @@ button{font-family:inherit;}
   margin-top:6px; padding-top:12px; border-top:1px dashed var(--line); width:100%;
   font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.6; text-align:left;
 }
+.flash-detail-label{
+  font-family:var(--mono); font-size:9.5px; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--amber); margin-bottom:4px; font-weight:700;
+}
 
 /* Question card */
 .q-card{background:var(--surface); border:none; border-radius:var(--radius); padding:16px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.18);}
@@ -1565,9 +1569,10 @@ function renderMock(){
 /* ---------------- PAGE: FLASHCARDS ---------------- */
 function buildFlashDeck(){
   const cards = [];
-  AZURE_SERVICES.forEach(s=>cards.push({id:'fc-'+s.id, front:s.name, back:s.short||s.purpose, detail:s.short?s.purpose:null, tag:'Azure'}));
-  SAP_TOPICS.forEach(s=>cards.push({id:'fc-'+s.id, front:s.name, back:s.short||s.purpose, detail:s.short?s.purpose:null, tag:'SAP'}));
-  AI_TOPICS.forEach(s=>cards.push({id:'fc-'+s.id, front:s.term, back:s.short||s.def, detail:s.short?s.def:null, tag:'AI'}));
+  AZURE_SERVICES.forEach(s=>cards.push({id:'fc-'+s.id, front:s.name, back:s.short||s.purpose, detail:s.mistake, tag:'Azure'}));
+  SAP_TOPICS.forEach(s=>cards.push({id:'fc-'+s.id, front:s.name, back:s.short||s.purpose, detail:s.mistake, tag:'SAP'}));
+  AI_TOPICS.forEach(s=>cards.push({id:'fc-'+s.id, front:s.term, back:s.short||s.def, detail:s.pitfall, tag:'AI'}));
+  Q.forEach(q=>cards.push({id:'fc-'+q.id, front:q.q, back:q.short, detail:q.tip, tag:q.cat}));
   return cards;
 }
 let FLASH_DECK = [];
@@ -1576,14 +1581,14 @@ let flashFilter = 'All';
 let flashShuffled = false;
 function renderFlashcards(){
   if(FLASH_DECK.length===0) FLASH_DECK = buildFlashDeck();
-  const tags = ['All','Azure','SAP','AI','Bookmarked'];
+  const tags = ['All', ...new Set(FLASH_DECK.map(c=>c.tag)), 'Bookmarked'];
   let deck = FLASH_DECK;
   if(flashFilter==='Bookmarked') deck = deck.filter(c=>DB.bookmarks[c.id.replace('fc-','')]);
   else if(flashFilter!=='All') deck = deck.filter(c=>c.tag===flashFilter);
   if(flashIndex >= deck.length) flashIndex = 0;
   const card = deck[flashIndex];
-  let html = pageHead('Flashcards', 'Click a card to flip. Bookmark tough ones — they surface in the Bookmarked filter.');
-  html += `<div class="filter-row">${tags.map(t=>`<button class="filter-btn ${flashFilter===t?'active':''}" onclick="flashFilter='${t}'; flashIndex=0; renderPage();">${t}</button>`).join('')}
+  let html = pageHead('Flashcards', `${FLASH_DECK.length} cards. Quick answer up top; the common mistake to avoid sits below in small text. Bookmark tough ones — they surface in the Bookmarked filter.`);
+  html += `<div class="filter-row">${tags.map(t=>`<button class="filter-btn ${flashFilter===t?'active':''}" onclick="flashFilter='${t}'; flashIndex=0; renderPage();">${t==='Core'?'⭐ Core':t}</button>`).join('')}
     <button class="filter-btn" onclick="shuffleFlash();">🔀 Shuffle</button></div>`;
   if(!card){
     html += `<div class="card" style="text-align:center;padding:40px;">No cards in this filter yet — bookmark some spec cards first.</div>`;
@@ -1593,8 +1598,8 @@ function renderFlashcards(){
     <div class="card-sub" style="text-align:center;margin-bottom:10px;">${flashIndex+1} / ${deck.length} · ${card.tag}</div>
     <div class="flash-wrap">
       <div class="flash-card ${window.__flashFlipped?'flipped':''}" onclick="window.__flashFlipped=!window.__flashFlipped; renderPage();">
-        <div class="flash-face"><div class="eyebrow" style="color:${CAT_COLORS[card.tag]||'var(--azure)'};">${card.tag}</div><div style="font-size:19px;font-weight:700;margin-top:10px;">${esc(card.front)}</div><div class="card-sub" style="margin-top:12px;">Click to reveal</div></div>
-        <div class="flash-face back"><div style="font-size:16.5px;font-weight:700;line-height:1.4;">${esc(card.back)}</div>${card.detail?`<div class="flash-detail">${esc(card.detail)}</div>`:''}</div>
+        <div class="flash-face"><div class="eyebrow" style="color:${CAT_COLORS[card.tag]||'var(--azure)'};">${card.tag==='Core'?'⭐ Core':esc(card.tag)}</div><div style="font-size:${card.front.length>50?15:19}px;font-weight:700;margin-top:10px;line-height:1.35;">${esc(card.front)}</div><div class="card-sub" style="margin-top:12px;">Click to reveal</div></div>
+        <div class="flash-face back"><div style="font-size:16.5px;font-weight:700;line-height:1.4;">${esc(card.back)}</div>${card.detail?`<div class="flash-detail"><div class="flash-detail-label">⚠ Watch out</div>${esc(card.detail)}</div>`:''}</div>
       </div>
     </div>
     <div style="display:flex;justify-content:space-between;margin-top:16px;gap:8px;">
