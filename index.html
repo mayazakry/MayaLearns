@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Senior Solution Architect – Data & AI · Study Hub</title>
+<style>
+:root{
+  --bg:#000000; --surface:#1C1C1E; --surface2:#2C2C2E; --surface3:#3A3A3C;
+  --line:#38383A; --line-soft:#2C2C2E;
+  --azure:#0A84FF; --azure-dim:#0A2F52;
+  --purple:#BF5AF2; --purple-dim:#3A1E52;
+  --text:#F5F5F7; --muted:#98989D; --muted2:#68686D;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: -apple-system, "SF Pro Text", "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+  --radius: 20px;
+  --shadow: 0 10px 34px rgba(0,0,0,.45);
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#F2F2F7; --surface:#FFFFFF; --surface2:#F2F2F7; --surface3:#E5E5EA;
+    --line:#E5E5EA; --line-soft:#EFEFF4;
+    --azure:#007AFF; --azure-dim:#E5F1FF;
+    --purple:#AF52DE; --purple-dim:#F5E9FC;
+    --text:#1C1C1E; --muted:#6E6E73; --muted2:#8E8E93;
+    --shadow: 0 10px 26px rgba(30,30,45,.10);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F2F2F7; --surface:#FFFFFF; --surface2:#F2F2F7; --surface3:#E5E5EA;
+  --line:#E5E5EA; --line-soft:#EFEFF4;
+  --azure:#007AFF; --azure-dim:#E5F1FF;
+  --purple:#AF52DE; --purple-dim:#F5E9FC;
+  --text:#1C1C1E; --muted:#6E6E73; --muted2:#8E8E93;
+  --shadow: 0 10px 26px rgba(30,30,45,.10);
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#1C1C1E; --surface2:#2C2C2E; --surface3:#3A3A3C;
+  --line:#38383A; --line-soft:#2C2C2E;
+  --azure:#0A84FF; --azure-dim:#0A2F52;
+  --purple:#BF5AF2; --purple-dim:#3A1E52;
+  --text:#F5F5F7; --muted:#98989D; --muted2:#68686D;
+  --shadow: 0 10px 34px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:
+    radial-gradient(1000px 520px at 100% -10%, var(--azure-dim) 0%, transparent 55%),
+    radial-gradient(900px 480px at 0% 110%, var(--purple-dim) 0%, transparent 55%),
+    var(--bg);
+  color:var(--text); font-family:var(--sans); line-height:1.5; min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:32px 20px;
+}
+.wrap{ width:100%; max-width:920px; }
+.eyebrow{
+  font-family:var(--mono); text-transform:uppercase; letter-spacing:.16em; font-size:11px;
+  color:var(--muted); text-align:center; margin-bottom:10px;
+}
+h1{
+  text-align:center; font-size:clamp(22px,4vw,32px); font-weight:700; letter-spacing:-.01em;
+  margin-bottom:8px;
+}
+.sub{
+  text-align:center; color:var(--muted); font-size:14.5px; margin-bottom:44px;
+}
+.choices{
+  display:grid; grid-template-columns:1fr 1fr; gap:20px;
+}
+@media (max-width:680px){ .choices{ grid-template-columns:1fr; } }
+a.card{
+  display:block; text-decoration:none; color:inherit;
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:36px 28px; box-shadow:var(--shadow);
+  transition:transform .15s ease, border-color .15s ease, background .15s ease;
+  min-height:220px; display:flex; flex-direction:column; justify-content:space-between;
+}
+a.card:hover{ transform:translateY(-4px); border-color:var(--azure); }
+a.card:active{ transform:translateY(-1px); }
+.card-tag{
+  font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.1em;
+  color:var(--azure); background:var(--azure-dim); display:inline-block;
+  padding:4px 10px; border-radius:20px; margin-bottom:18px; width:fit-content;
+}
+.card.purple .card-tag{ color:var(--purple); background:var(--purple-dim); }
+.card-title{
+  font-size:22px; font-weight:700; letter-spacing:-.01em; margin-bottom:10px;
+}
+.card-desc{
+  font-size:14px; color:var(--muted); line-height:1.55;
+}
+.card-cta{
+  margin-top:22px; font-family:var(--mono); font-size:12px; color:var(--muted2);
+  display:flex; align-items:center; gap:6px;
+}
+a.card:hover .card-cta{ color:var(--azure); }
+.card.purple:hover{ border-color:var(--purple); }
+.card.purple:hover .card-cta{ color:var(--purple); }
+footer{
+  text-align:center; color:var(--muted2); font-size:12px; margin-top:40px; font-family:var(--mono);
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Interview Prep</div>
+  <h1>Senior Solution Architect — Data &amp; AI</h1>
+  <p class="sub">Pick a study guide to open.</p>
+
+  <div class="choices">
+    <a class="card" href="Azure-Architect-Interview-Dashboard.html">
+      <div>
+        <span class="card-tag">Azure</span>
+        <div class="card-title">Azure Data &amp; AI Solution Architect</div>
+        <div class="card-desc">Interview Command Center — deep-dive dashboard covering Azure data &amp; AI architecture topics, patterns, and drills.</div>
+      </div>
+      <div class="card-cta">Open dashboard →</div>
+    </a>
+
+    <a class="card purple" href="sonata-interview-prep.html">
+      <div>
+        <span class="card-tag">Sonata</span>
+        <div class="card-title">Senior Solution Architect Interview Prep</div>
+        <div class="card-desc">DWG-01 guide — role-specific prep focused on the Senior Solution Architect interview loop.</div>
+      </div>
+      <div class="card-cta">Open guide →</div>
+    </a>
+  </div>
+
+  <footer>MayaLearns · Study Hub</footer>
+</div>
+</body>
+</html>
